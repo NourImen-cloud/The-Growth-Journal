@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Quicksand', 'Nunito', sans-serif;
+    background-color: #F8F5F2;
+    color: #4A3E4E;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.font-handwriting {
+  font-family: 'Caveat', cursive;
+}
+
+.font-body {
+  font-family: 'Quicksand', sans-serif;
+}
+
+.font-title {
+  font-family: 'Nunito', sans-serif;
+}
+
+/* Cozy Custom Shadows & Glows */
+.shadow-cozy {
+  box-shadow: 0 4px 20px -2px rgba(186, 170, 195, 0.25), 0 2px 6px -1px rgba(186, 170, 195, 0.15);
+}
+
+.shadow-cozy-hover {
+  box-shadow: 0 10px 25px -4px rgba(162, 142, 175, 0.3), 0 4px 10px -2px rgba(162, 142, 175, 0.2);
+}
+
+.shadow-soft-card {
+  box-shadow: 0 2px 12px rgba(147, 120, 160, 0.08);
+}
+
+/* Washi tape effect */
+.washi-tape {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  width: 90px;
+  height: 22px;
+  background-color: rgba(224, 204, 236, 0.85);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+  border-left: 2px dashed rgba(255, 255, 255, 0.6);
+  border-right: 2px dashed rgba(255, 255, 255, 0.6);
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.washi-tape-pink {
+  background-color: rgba(255, 214, 224, 0.85);
+}
+
+.washi-tape-yellow {
+  background-color: rgba(254, 240, 205, 0.85);
+}
+
+/* Grid background for journal feel */
+.bg-grid-pattern {
+  background-image: radial-gradient(rgba(179, 157, 190, 0.22) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(#d3c4db 1.2px, transparent 1.2px);
+  background-size: 16px 16px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F3EEF6;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4C3DF;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #BAA2C9;
+}
