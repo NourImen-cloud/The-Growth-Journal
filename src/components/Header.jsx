@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Search, Bell, Moon, Menu, Sparkles, Heart, CheckCircle2 } from 'lucide-react';
+import { Search, Bell, Moon, Sun, Menu, Sparkles, Heart, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useJournal } from '../context/JournalContext';
 
 export default function Header({ onMenuClick }) {
-  const { data, updateProfile, searchQuery, setSearchQuery } = useJournal();
+  const { data, updateProfile, searchQuery, setSearchQuery, isDarkMode, toggleDarkMode, resetToFresh } = useJournal();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [tempName, setTempName] = useState(data.profile.name);
   const [tempSubtitle, setTempSubtitle] = useState(data.profile.subtitle);
@@ -27,7 +27,7 @@ export default function Header({ onMenuClick }) {
   };
 
   return (
-    <header className="px-4 lg:px-8 py-4 border-b border-[#EDE5F4] bg-[#FAF8FB]/90 backdrop-blur-xs sticky top-0 z-30">
+    <header className="px-4 lg:px-8 py-4 border-b border-[#EDE5F4] bg-[#FAF8FB]/90 backdrop-blur-xs sticky top-0 z-30 transition-colors">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Left: Greeting & Motto */}
         <div className="flex items-center gap-3">
@@ -51,7 +51,7 @@ export default function Header({ onMenuClick }) {
           </div>
         </div>
 
-        {/* Right: Search, Notification, Avatar */}
+        {/* Right: Search, Notification, Dark Mode Toggle, Avatar */}
         <div className="flex items-center gap-2.5 self-end md:self-auto w-full md:w-auto">
           {/* Search bar */}
           <div className="relative flex-1 md:w-64">
@@ -88,15 +88,15 @@ export default function Header({ onMenuClick }) {
                   <div className="p-2 bg-[#F9F5FC] rounded-lg text-[#5F4D69] flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">English Practice</p>
-                      <p className="text-[11px] text-[#8C7A96]">Record your weekly speaking log today!</p>
+                      <p className="font-semibold">Define Monthly Focus</p>
+                      <p className="text-[11px] text-[#8C7A96]">Set the skills and milestones for this month!</p>
                     </div>
                   </div>
                   <div className="p-2 bg-[#FFF7ED] rounded-lg text-[#6A4D3B] flex items-start gap-2">
                     <Heart className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold">Hydration Check</p>
-                      <p className="text-[11px] text-[#937562]">Don't forget your warm herbal tea ♡</p>
+                      <p className="font-semibold">Build Daily Consistency</p>
+                      <p className="text-[11px] text-[#937562]">Check off your first daily routine today ♡</p>
                     </div>
                   </div>
                 </div>
@@ -104,19 +104,33 @@ export default function Header({ onMenuClick }) {
             )}
           </div>
 
-          {/* Night / Soft theme decorative icon */}
-          <div
-            className="w-9 h-9 rounded-full bg-white border border-[#E7DCEE] flex items-center justify-center text-[#74617F] shadow-2xs cursor-pointer hover:bg-[#F5EDFA]"
-            title="Cozy soft light mode active"
+          {/* WORKING DARK MODE TOGGLE */}
+          <button
+            onClick={toggleDarkMode}
+            className={`
+              w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 shadow-2xs
+              ${isDarkMode 
+                ? 'bg-[#2D2340] border-[#5B477D] text-amber-300 hover:bg-[#382C4E]' 
+                : 'bg-white border-[#E7DCEE] text-[#8B5CF6] hover:bg-[#F5EDFA]'}
+            `}
+            title={isDarkMode ? "Switch to Cozy Light Mode ☀️" : "Switch to Cozy Midnight Mode 🌙"}
           >
-            <Moon className="w-4 h-4 text-[#8B5CF6]" />
-          </div>
+            {isDarkMode ? (
+              <Sun className="w-4 h-4 fill-amber-300 text-amber-400 animate-spin-slow" />
+            ) : (
+              <Moon className="w-4 h-4 fill-[#A855F7]/30 text-[#8B5CF6]" />
+            )}
+          </button>
 
           {/* User Avatar & Edit modal trigger */}
           <button
-            onClick={() => setShowProfileModal(true)}
+            onClick={() => {
+              setTempName(data.profile.name);
+              setTempSubtitle(data.profile.subtitle);
+              setShowProfileModal(true);
+            }}
             className="relative group focus:outline-hidden"
-            title="Edit profile & greeting"
+            title="Edit profile & journal settings"
           >
             <div className="w-10 h-10 rounded-full border-2 border-[#D8B4FE] p-0.5 shadow-2xs overflow-hidden transition-transform group-hover:scale-105">
               <img
@@ -130,9 +144,9 @@ export default function Header({ onMenuClick }) {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
+      {/* Edit Profile & Reset Modal */}
       {showProfileModal && (
-        <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-lg font-bold text-[#4B3953] font-title mb-1">
               Personalize Your Space 🌸
@@ -168,20 +182,36 @@ export default function Header({ onMenuClick }) {
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="pt-2 border-t border-[#F0E5F5] flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setShowProfileModal(false)}
-                  className="px-4 py-2 text-xs font-medium text-[#7D6B87] hover:bg-gray-100 rounded-xl"
+                  onClick={() => {
+                    if (window.confirm("Start fresh with a clean slate? This will reset your hours and progress.")) {
+                      resetToFresh();
+                      setShowProfileModal(false);
+                    }
+                  }}
+                  className="text-xs text-rose-500 hover:text-rose-700 flex items-center gap-1 font-medium"
                 >
-                  Cancel
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Start Clean Slate</span>
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl shadow-xs"
-                >
-                  Save Changes
-                </button>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowProfileModal(false)}
+                    className="px-3 py-1.5 text-xs text-[#7D6B87]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl shadow-xs"
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -15,7 +15,8 @@ import {
   PenTool,
   Headphones,
   Award,
-  Compass
+  Compass,
+  Edit3
 } from 'lucide-react';
 import { useJournal } from '../context/JournalContext';
 import PomodoroWidget from './PomodoroWidget';
@@ -29,6 +30,8 @@ export default function Dashboard() {
     toggleScheduleItem, 
     addScheduleItem, 
     toggleHabitDate, 
+    addHabit,
+    updateMonthlySkill,
     addQuickNote 
   } = useJournal();
 
@@ -38,7 +41,19 @@ export default function Dashboard() {
   const [newNoteText, setNewNoteText] = useState('');
   const [showAddNote, setShowAddNote] = useState(false);
 
-  const currentMonth = data.monthlyFocusList[0]; // November - English
+  // Quick Add Habit Modal
+  const [showAddHabitModal, setShowAddHabitModal] = useState(false);
+  const [newHabitName, setNewHabitName] = useState('');
+  const [newHabitCategory, setNewHabitCategory] = useState('Learning');
+  const [newHabitColor, setNewHabitColor] = useState('#A855F7');
+
+  // Quick Edit Monthly Skill Modal
+  const [showEditSkillModal, setShowEditSkillModal] = useState(false);
+  const currentMonth = data.monthlyFocusList[0];
+  const [quickSkillName, setQuickSkillName] = useState(currentMonth.skill);
+  const [quickGoal, setQuickGoal] = useState(currentMonth.goal);
+  const [quickTargetHours, setQuickTargetHours] = useState(currentMonth.targetHours);
+
   const todayStr = new Date().toISOString().split('T')[0];
 
   // Calculate today's habit completion
@@ -46,9 +61,9 @@ export default function Dashboard() {
     (h) => data.habitHistory?.[`${h.id}_${todayStr}`]
   ).length;
 
-  const currentMonthProgress = Math.round(
-    (currentMonth.completedHours / currentMonth.targetHours) * 100
-  );
+  const currentMonthProgress = currentMonth.targetHours > 0
+    ? Math.round((currentMonth.completedHours / currentMonth.targetHours) * 100)
+    : 0;
 
   const handleAddPlan = (e) => {
     e.preventDefault();
@@ -63,6 +78,28 @@ export default function Dashboard() {
     setNewScheduleTitle('');
     setNewScheduleTime('');
     setShowAddPlanModal(false);
+  };
+
+  const handleAddHabit = (e) => {
+    e.preventDefault();
+    if (!newHabitName.trim()) return;
+    addHabit({
+      name: newHabitName.trim(),
+      category: newHabitCategory,
+      color: newHabitColor,
+    });
+    setNewHabitName('');
+    setShowAddHabitModal(false);
+  };
+
+  const handleQuickSaveSkill = (e) => {
+    e.preventDefault();
+    updateMonthlySkill(currentMonth.id, {
+      skill: quickSkillName,
+      goal: quickGoal,
+      targetHours: Number(quickTargetHours),
+    });
+    setShowEditSkillModal(false);
   };
 
   const handleAddNote = (e) => {
@@ -85,11 +122,16 @@ export default function Dashboard() {
               <span>Today's Focus</span>
             </div>
             <button
-              onClick={() => setActiveSection('monthlyFocus')}
-              className="text-[11px] font-semibold text-[#A855F7] hover:text-[#7E22CE] flex items-center gap-0.5"
+              onClick={() => {
+                setQuickSkillName(currentMonth.skill);
+                setQuickGoal(currentMonth.goal);
+                setQuickTargetHours(currentMonth.targetHours);
+                setShowEditSkillModal(true);
+              }}
+              className="text-[11px] font-semibold text-[#A855F7] dark:text-purple-300 hover:text-[#7E22CE] flex items-center gap-1 bg-[#FAF5FD] dark:bg-purple-950/50 px-2 py-0.5 rounded-full border border-[#EEDBFA] dark:border-purple-800"
             >
-              <span>{currentMonth.month} Focus</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <Edit3 className="w-3 h-3" />
+              <span>Define Skill</span>
             </button>
           </div>
 
@@ -138,7 +180,7 @@ export default function Dashboard() {
             <div className="flex-1 space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#7F6B8A] font-medium">Monthly Skill:</span>
-                <span className="font-bold text-[#6B21A8] bg-[#F5EEFB] px-2 py-0.5 rounded-full text-[11px]">
+                <span className="font-bold text-[#6B21A8] bg-[#F5EEFB] px-2 py-0.5 rounded-full text-[11px] truncate max-w-[120px]">
                   {currentMonth.skill}
                 </span>
               </div>
@@ -159,59 +201,75 @@ export default function Dashboard() {
 
           {/* Quote Pill */}
           <div className="bg-[#FAF5FC] border border-[#EEDBFA] rounded-2xl p-2.5 text-[11px] text-[#695275] italic leading-snug">
-            "{data.todayGoal.quote}"
+            "{currentMonth.quote}"
           </div>
         </div>
 
         {/* Widget 2: Pomodoro Timer */}
         <PomodoroWidget />
 
-        {/* Widget 3: Tasks & Habits Today */}
+        {/* Widget 3: Tasks & Habits Today (with direct + Add Habit button!) */}
         <div className="bg-white/90 backdrop-blur-xs rounded-3xl p-5 border border-[#ECE0F2] shadow-soft-card flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between pb-2 border-b border-[#F3EAF8]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
               <span>🌸</span>
               <span>Tasks & Habits Today</span>
             </div>
-            <button
-              onClick={() => setActiveSection('habitTracker')}
-              className="text-[11px] font-semibold text-[#A855F7] hover:underline"
-            >
-              Habit Grid
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowAddHabitModal(true)}
+                className="text-[11px] font-semibold text-[#8B5CF6] dark:text-purple-300 bg-[#F7EFFC] dark:bg-purple-900/50 hover:bg-[#EEDBFA] dark:hover:bg-purple-900/70 border border-[#EEDBFA] dark:border-purple-800 px-2.5 py-0.5 rounded-full transition-colors flex items-center gap-1 shadow-2xs"
+                title="Add a new routine"
+              >
+                <Plus className="w-3 h-3" />
+                <span>Add Habit</span>
+              </button>
+              <button
+                onClick={() => setActiveSection('habitTracker')}
+                className="text-[11px] font-semibold text-[#A855F7] hover:underline"
+              >
+                Habit Grid
+              </button>
+            </div>
           </div>
 
           {/* Quick list of today's habits */}
           <div className="my-2 space-y-1.5 max-h-48 overflow-y-auto pr-1">
-            {data.habits.slice(0, 5).map((habit) => {
-              const historyKey = `${habit.id}_${todayStr}`;
-              const isChecked = !!data.habitHistory?.[historyKey];
-              return (
-                <div
-                  key={habit.id}
-                  onClick={() => toggleHabitDate(habit.id, todayStr)}
-                  className={`
-                    flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-all
-                    ${isChecked ? 'bg-[#F4EDFA] text-[#6E4287]' : 'hover:bg-[#FAF6FC] text-[#55435E]'}
-                  `}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {isChecked ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#A855F7] fill-[#EDE5F8]" />
-                    ) : (
-                      <Circle className="w-4 h-4 text-[#C9BACF]" />
-                    )}
-                    <span className={`font-medium ${isChecked ? 'line-through opacity-70' : ''}`}>
-                      {habit.name}
-                    </span>
+            {data.habits.length === 0 ? (
+              <div className="text-center py-6 text-xs text-[#9E8AA9] italic">
+                No habits added yet. Click "+ Add Habit" to start!
+              </div>
+            ) : (
+              data.habits.slice(0, 6).map((habit) => {
+                const historyKey = `${habit.id}_${todayStr}`;
+                const isChecked = !!data.habitHistory?.[historyKey];
+                return (
+                  <div
+                    key={habit.id}
+                    onClick={() => toggleHabitDate(habit.id, todayStr)}
+                    className={`
+                      flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-all
+                      ${isChecked ? 'bg-[#F4EDFA] text-[#6E4287]' : 'hover:bg-[#FAF6FC] text-[#55435E]'}
+                    `}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {isChecked ? (
+                        <CheckCircle2 className="w-4 h-4 text-[#A855F7] fill-[#EDE5F8]" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-[#C9BACF]" />
+                      )}
+                      <span className={`font-medium ${isChecked ? 'line-through opacity-70' : ''}`}>
+                        {habit.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-[#A694AF]">
+                      <Flame className="w-3 h-3 text-amber-500 fill-amber-400" />
+                      <span>{habit.streak}d</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] text-[#A694AF]">
-                    <Flame className="w-3 h-3 text-amber-500 fill-amber-400" />
-                    <span>{habit.streak}d</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
 
           <div className="pt-2 border-t border-[#F3EAF8] flex items-center justify-between text-[11px] text-[#867391]">
@@ -224,46 +282,58 @@ export default function Dashboard() {
       {/* Middle Row: Today's Plan + Subject/Skill Progress + Motivation Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {/* Card 4: Today's Plan (Schedule) */}
-        <div className="bg-white/90 backdrop-blur-xs rounded-3xl p-5 border border-[#ECE0F2] shadow-soft-card flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-[#F3EAF8]">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
-              <span>📅</span>
-              <span>Today's Plan</span>
+        <div className="bg-white/90 backdrop-blur-xs rounded-3xl p-5 border border-[#ECE0F2] shadow-soft-card flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-3 border-b border-[#F3EAF8]">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
+                <span>📅</span>
+                <span>Today's Plan</span>
+              </div>
+              <button
+                onClick={() => setShowAddPlanModal(true)}
+                className="text-[11px] font-semibold text-[#A855F7] dark:text-purple-300 bg-[#F7EFFC] dark:bg-purple-900/50 hover:bg-[#EEDFFA] dark:hover:bg-purple-900/70 border border-[#EEDBFA] dark:border-purple-800 px-2.5 py-1 rounded-full transition-colors flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                <span>Add Block</span>
+              </button>
             </div>
-            <button
-              onClick={() => setShowAddPlanModal(true)}
-              className="text-[11px] font-semibold text-[#A855F7] bg-[#F7EFFC] hover:bg-[#EEDFFA] px-2.5 py-1 rounded-full transition-colors flex items-center gap-1"
-            >
-              <Plus className="w-3 h-3" />
-              <span>Add Block</span>
-            </button>
+
+            {/* Plan Timeline Items */}
+            <div className="mt-3 space-y-2 max-h-72 overflow-y-auto pr-1">
+              {data.todaySchedule.length === 0 ? (
+                <div className="text-center py-8 text-xs text-[#9B88A5] italic">
+                  Your day is open. Click "+ Add Block" to plan your morning & focus sessions! ✨
+                </div>
+              ) : (
+                data.todaySchedule.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => toggleScheduleItem(item.id)}
+                    className={`
+                      flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-colors border
+                      ${item.completed 
+                        ? 'bg-[#FAF7FC] border-[#EEDBFA] text-[#887593] line-through' 
+                        : 'bg-white border-[#F0E5F5] text-[#4E3C56] hover:border-[#D8B4FE]'}
+                    `}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[11px] font-semibold text-[#8C52AA] w-16 shrink-0">
+                        {item.time}
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+                      <span className="font-medium truncate max-w-[130px]">{item.title}</span>
+                    </div>
+                    <span className="text-[10px] text-[#A291AB] font-mono shrink-0">
+                      {item.duration}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
-          {/* Plan Timeline Items */}
-          <div className="mt-3 space-y-2 max-h-72 overflow-y-auto pr-1">
-            {data.todaySchedule.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => toggleScheduleItem(item.id)}
-                className={`
-                  flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-colors border
-                  ${item.completed 
-                    ? 'bg-[#FAF7FC] border-[#EEDBFA] text-[#887593] line-through' 
-                    : 'bg-white border-[#F0E5F5] text-[#4E3C56] hover:border-[#D8B4FE]'}
-                `}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] font-semibold text-[#8C52AA] w-16 shrink-0">
-                    {item.time}
-                  </span>
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="font-medium truncate max-w-[130px]">{item.title}</span>
-                </div>
-                <span className="text-[10px] text-[#A291AB] font-mono shrink-0">
-                  {item.duration}
-                </span>
-              </div>
-            ))}
+          <div className="pt-2 border-t border-[#F3EAF8] text-right">
+            <span className="text-[11px] text-[#A291AB]">Plan with calm intention</span>
           </div>
         </div>
 
@@ -272,26 +342,27 @@ export default function Dashboard() {
           <div className="flex items-center justify-between pb-3 border-b border-[#F3EAF8]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
               <span>📚</span>
-              <span>English Skill Breakdown</span>
+              <span>Skill Studio Breakdown</span>
             </div>
             <button
               onClick={() => setActiveSection('skillProgress')}
               className="text-[11px] font-semibold text-[#A855F7] hover:underline"
             >
-              View Full Studio
+              Open Studio
             </button>
           </div>
 
           {/* Skill Breakdown Rows */}
           <div className="my-2 space-y-3">
             {[
-              { name: 'Speaking Practice', icon: Headphones, progress: 75, color: '#A855F7', detail: '3 recorded logs' },
-              { name: 'Essay Writing', icon: PenTool, progress: 65, color: '#EC4899', detail: '3 submitted' },
-              { name: 'Listening & Podcasts', icon: Sparkles, progress: 90, color: '#3B82F6', detail: '3 episodes analyzed' },
-              { name: 'Book Reading', icon: BookOpen, progress: 85, color: '#10B981', detail: '275 / 320 pages' },
-              { name: 'Vocabulary Flashcards', icon: Languages, progress: 70, color: '#F59E0B', detail: '4 / 6 mastered' },
+              { name: 'Speaking Practice', icon: Headphones, progress: data.skillsData.english.speaking.length * 20, color: '#A855F7', detail: `${data.skillsData.english.speaking.length} logs recorded` },
+              { name: 'Essay Writing', icon: PenTool, progress: data.skillsData.english.writing.length * 25, color: '#EC4899', detail: `${data.skillsData.english.writing.length} submitted` },
+              { name: 'Listening & Podcasts', icon: Sparkles, progress: data.skillsData.english.listening.length * 30, color: '#3B82F6', detail: `${data.skillsData.english.listening.length} completed` },
+              { name: 'Book Reading', icon: BookOpen, progress: 0, color: '#10B981', detail: '0 pages logged' },
+              { name: 'Vocabulary Deck', icon: Languages, progress: data.skillsData.english.vocabulary.filter(v => v.mastered).length * 33, color: '#F59E0B', detail: `${data.skillsData.english.vocabulary.filter(v => v.mastered).length} mastered` },
             ].map((skill, idx) => {
               const Icon = skill.icon;
+              const boundedProgress = Math.min(100, skill.progress);
               return (
                 <div key={idx} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
@@ -302,14 +373,14 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-[#9785A1]">{skill.detail}</span>
                       <span className="font-bold text-[11px]" style={{ color: skill.color }}>
-                        {skill.progress}%
+                        {boundedProgress}%
                       </span>
                     </div>
                   </div>
                   <div className="w-full bg-[#F3ECF8] h-1.5 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${skill.progress}%`, backgroundColor: skill.color }}
+                      style={{ width: `${boundedProgress}%`, backgroundColor: skill.color }}
                     />
                   </div>
                 </div>
@@ -318,7 +389,7 @@ export default function Dashboard() {
           </div>
 
           <div className="pt-2 border-t border-[#F3EAF8] text-right">
-            <span className="text-[11px] text-[#86569B] font-medium">Next milestone: Vocabulary Quiz in 3 days</span>
+            <span className="text-[11px] text-[#86569B] font-medium">Ready for your first session ♡</span>
           </div>
         </div>
 
@@ -356,7 +427,7 @@ export default function Dashboard() {
           </div>
 
           <div className="mt-2 text-center text-[11px] text-[#A18EA9]">
-            <span>A little note pinned for Divya</span>
+            <span>A little note pinned for your journey</span>
           </div>
         </div>
       </div>
@@ -380,7 +451,7 @@ export default function Dashboard() {
           <div className="my-3">
             <div className="flex items-end justify-between h-28 gap-2 pt-4 px-1">
               {data.weeklyOverview.map((item, idx) => {
-                const heightPercent = (item.hours / 8) * 100;
+                const heightPercent = item.hours > 0 ? (item.hours / 8) * 100 : 8;
                 return (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-1 group">
                     <span className="text-[10px] font-mono text-[#8C52AA] opacity-0 group-hover:opacity-100 transition-opacity">
@@ -403,10 +474,10 @@ export default function Dashboard() {
           <div className="pt-2 border-t border-[#F3EAF8] flex items-center justify-between text-xs">
             <div>
               <span className="text-[#887593]">Total Study Time: </span>
-              <span className="font-bold text-[#4B3657]">32h 15m</span>
+              <span className="font-bold text-[#4B3657]">{currentMonth.completedHours}h 00m</span>
             </div>
-            <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold text-[10px]">
-              ↑ 12% vs last week
+            <span className="text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full font-semibold text-[10px]">
+              Ready for Day 1
             </span>
           </div>
         </div>
@@ -428,10 +499,10 @@ export default function Dashboard() {
 
           <div className="my-2 space-y-2.5">
             {[
-              { title: 'Score 90% in Midterms / Cert', progress: 75, color: '#C084FC' },
-              { title: 'Read 30 Books this Year', progress: 40, color: '#F472B6' },
-              { title: 'English Fluency & Speech', progress: 60, color: '#38BDF8' },
-              { title: 'Save for Summer Study Trip', progress: 30, color: '#4ADE80' },
+              { title: 'Complete First 30 Days of Habit Consistency', progress: 0, color: '#C084FC' },
+              { title: 'Read 12 Books this Season', progress: 0, color: '#F472B6' },
+              { title: 'Conquer Core Monthly Skill Focus', progress: currentMonthProgress, color: '#38BDF8' },
+              { title: 'Pen 20 Introspective Journal Reflections', progress: 0, color: '#4ADE80' },
             ].map((goal, idx) => (
               <div key={idx} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
@@ -493,9 +564,164 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Quick Add Habit Modal */}
+      {showAddHabitModal && (
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
+            <h3 className="text-base font-bold text-[#4B3953] font-title mb-1">
+              Add New Daily Routine 🌸
+            </h3>
+            <p className="text-xs text-[#897793] mb-4">
+              Track a small daily habit to build your future self.
+            </p>
+
+            <form onSubmit={handleAddHabit} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Routine Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 15 min Speaking / Deep Work"
+                  value={newHabitName}
+                  onChange={(e) => setNewHabitName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  required
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Category
+                </label>
+                <select
+                  value={newHabitCategory}
+                  onChange={(e) => setNewHabitCategory(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                >
+                  <option value="Learning">Learning & Skill</option>
+                  <option value="Mind">Mind & Journaling</option>
+                  <option value="Health">Health & Fitness</option>
+                  <option value="Wellness">Wellness & Sleep</option>
+                  <option value="Creativity">Creativity & Design</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Accent Color
+                </label>
+                <div className="flex items-center gap-2">
+                  {['#A855F7', '#EC4899', '#3B82F6', '#10B981', '#F59E0B', '#6366F1'].map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setNewHabitColor(color)}
+                      className={`w-6 h-6 rounded-full transition-transform ${newHabitColor === color ? 'scale-125 ring-2 ring-purple-300' : ''}`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddHabitModal(false)}
+                  className="px-3 py-1.5 text-xs text-[#7D6B87]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl shadow-xs"
+                >
+                  Save Habit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Define Skill Modal */}
+      {showEditSkillModal && (
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
+            <h3 className="text-base font-bold text-[#4B3953] font-title mb-1">
+              Define This Month's Skill 🎯
+            </h3>
+            <p className="text-xs text-[#897793] mb-4">
+              Set the core ability you are focusing on right now.
+            </p>
+
+            <form onSubmit={handleQuickSaveSkill} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Skill Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. English, Python, Public Speaking"
+                  value={quickSkillName}
+                  onChange={(e) => setQuickSkillName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden font-bold text-[#6D28D9]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Learning Goal
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="What is your main target for this month?"
+                  value={quickGoal}
+                  onChange={(e) => setQuickGoal(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Target Study Hours (Month)
+                </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="200"
+                  value={quickTargetHours}
+                  onChange={(e) => setQuickTargetHours(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditSkillModal(false)}
+                  className="px-3 py-1.5 text-xs text-[#7D6B87]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl shadow-xs"
+                >
+                  Save Skill
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Add Plan Modal */}
       {showAddPlanModal && (
-        <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
               Add to Today's Plan 📅
@@ -503,11 +729,11 @@ export default function Dashboard() {
             <form onSubmit={handleAddPlan} className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-[#665370] mb-1">
-                  Time (e.g., 07:30 PM)
+                  Time (e.g., 08:00 AM)
                 </label>
                 <input
                   type="text"
-                  placeholder="07:30 PM"
+                  placeholder="08:00 AM"
                   value={newScheduleTime}
                   onChange={(e) => setNewScheduleTime(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
@@ -520,7 +746,7 @@ export default function Dashboard() {
                 </label>
                 <input
                   type="text"
-                  placeholder="English listening podcast"
+                  placeholder="e.g. English listening podcast"
                   value={newScheduleTitle}
                   onChange={(e) => setNewScheduleTitle(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
@@ -549,7 +775,7 @@ export default function Dashboard() {
 
       {/* Add Note Modal */}
       {showAddNote && (
-        <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
               Add a Cozy Note 📝

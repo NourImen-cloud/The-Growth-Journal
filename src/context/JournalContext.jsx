@@ -5,7 +5,8 @@ import { firePastelConfetti } from '../utils/confetti';
 
 const JournalContext = createContext();
 
-const STORAGE_KEY = 'growth_journal_data_v1';
+const STORAGE_KEY = 'growth_journal_data_v3_first_time';
+const DARK_MODE_KEY = 'growth_journal_dark_mode';
 
 export function JournalProvider({ children }) {
   const [data, setData] = useState(() => {
@@ -20,10 +21,38 @@ export function JournalProvider({ children }) {
     return initialData;
   });
 
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem(DARK_MODE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   const [activeSection, setActiveSection] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [ambientPlaying, setAmbientPlaying] = useState(false);
-  const [currentMonthId, setCurrentMonthId] = useState('nov-2026');
+  const [currentMonthId, setCurrentMonthId] = useState('focus-month-1');
+
+  // Sync dark mode class on document element
+  useEffect(() => {
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem(DARK_MODE_KEY, 'true');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem(DARK_MODE_KEY, 'false');
+      }
+    } catch {
+      // Ignore
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    playSoftPop();
+    setIsDarkMode((prev) => !prev);
+  };
 
   // Save to localStorage whenever data changes
   useEffect(() => {
@@ -47,6 +76,12 @@ export function JournalProvider({ children }) {
     }));
   };
 
+  // Reset to clean slate
+  const resetToFresh = () => {
+    setData(initialData);
+    playCelebrationChime();
+  };
+
   // Schedule toggle
   const toggleScheduleItem = (id) => {
     playSoftPop();
@@ -63,6 +98,7 @@ export function JournalProvider({ children }) {
       ...prev,
       todaySchedule: [...prev.todaySchedule, { ...item, id: Date.now().toString(), completed: false }],
     }));
+    playSoftPop();
   };
 
   // Habit toggling
@@ -112,6 +148,7 @@ export function JournalProvider({ children }) {
       ],
     }));
     playCelebrationChime();
+    firePastelConfetti();
   };
 
   const deleteHabit = (habitId) => {
@@ -122,6 +159,49 @@ export function JournalProvider({ children }) {
   };
 
   // Monthly Focus & Milestones
+  const updateMonthlySkill = (monthId, updates) => {
+    setData((prev) => ({
+      ...prev,
+      monthlyFocusList: prev.monthlyFocusList.map((m) =>
+        m.id === monthId ? { ...m, ...updates } : m
+      ),
+    }));
+    playCelebrationChime();
+  };
+
+  const addMonthlyMilestone = (monthId, milestoneTitle) => {
+    if (!milestoneTitle.trim()) return;
+    setData((prev) => ({
+      ...prev,
+      monthlyFocusList: prev.monthlyFocusList.map((m) =>
+        m.id === monthId
+          ? {
+              ...m,
+              milestones: [
+                ...m.milestones,
+                { id: 'ms_' + Date.now(), title: milestoneTitle.trim(), done: false },
+              ],
+            }
+          : m
+      ),
+    }));
+    playSoftPop();
+  };
+
+  const deleteMonthlyMilestone = (monthId, milestoneId) => {
+    setData((prev) => ({
+      ...prev,
+      monthlyFocusList: prev.monthlyFocusList.map((m) =>
+        m.id === monthId
+          ? {
+              ...m,
+              milestones: m.milestones.filter((ms) => ms.id !== milestoneId),
+            }
+          : m
+      ),
+    }));
+  };
+
   const toggleMonthlyMilestone = (monthId, milestoneId) => {
     playSoftPop();
     setData((prev) => {
@@ -207,7 +287,7 @@ export function JournalProvider({ children }) {
     setData((prev) => ({
       ...prev,
       achievements: prev.achievements.map((ach) =>
-        ach.id === id ? { ...ach, unlocked: true, unlockedDate: 'Just now! 🌸' } : ach
+        ach.id === id ? { ...ach, unlocked: true, unlockedDate: 'Unlocked Today! 🌸' } : ach
       ),
     }));
   };
@@ -401,6 +481,8 @@ export function JournalProvider({ children }) {
     <JournalContext.Provider
       value={{
         data,
+        isDarkMode,
+        toggleDarkMode,
         activeSection,
         setActiveSection,
         searchQuery,
@@ -410,11 +492,15 @@ export function JournalProvider({ children }) {
         currentMonthId,
         setCurrentMonthId,
         updateProfile,
+        resetToFresh,
         toggleScheduleItem,
         addScheduleItem,
         toggleHabitDate,
         addHabit,
         deleteHabit,
+        updateMonthlySkill,
+        addMonthlyMilestone,
+        deleteMonthlyMilestone,
         toggleMonthlyMilestone,
         updateMonthlyAssessment,
         updateMonthlyHours,

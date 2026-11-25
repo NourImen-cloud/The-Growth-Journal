@@ -29,8 +29,8 @@ export default function BottomDock() {
   ];
 
   return (
-    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 max-w-[95vw]">
-      <div className="bg-white/95 backdrop-blur-md border border-[#EADBEE] shadow-cozy-hover rounded-full px-4 py-2 flex items-center gap-1.5 md:gap-3">
+    <div className="fixed bottom-3 left-1/2 lg:left-[calc(50%+8rem)] -translate-x-1/2 z-40 max-w-[95vw]">
+      <div className="bg-white/95 dark:bg-[#231A33]/95 backdrop-blur-md border border-[#EADBEE] dark:border-[#3C2F52] shadow-cozy-hover rounded-full px-4 py-2 flex items-center gap-1.5 md:gap-3">
         {dockButtons.map((btn) => {
           const Icon = btn.icon;
           const isActive = activeSection === btn.id;

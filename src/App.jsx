@@ -37,7 +37,7 @@ function MainLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F5F2] flex flex-row relative bg-dot-pattern">
+    <div className="min-h-screen bg-[#F8F5F2] dark:bg-[#151120] flex flex-row relative bg-dot-pattern transition-colors">
       {/* Cozy Sidebar */}
       <Sidebar mobileOpen={mobileMenuOpen} setMobileOpen={setMobileMenuOpen} />
 

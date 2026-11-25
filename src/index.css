@@ -8,6 +8,7 @@
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   #root {
@@ -93,4 +94,166 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #BAA2C9;
+}
+
+/* =========================================
+   COZY MIDNIGHT / DARK MODE THEME STYLING 
+   ========================================= */
+
+html.dark body {
+  background-color: #171322 !important;
+  color: #EBDFF8 !important;
+}
+
+html.dark .bg-dot-pattern {
+  background-image: radial-gradient(rgba(139, 92, 246, 0.25) 1.2px, transparent 1.2px) !important;
+}
+
+html.dark aside {
+  background-color: #1C172B !important;
+  border-color: #2F2644 !important;
+}
+
+html.dark header {
+  background-color: rgba(28, 23, 43, 0.92) !important;
+  border-color: #2F2644 !important;
+}
+
+html.dark .bg-white,
+html.dark .bg-white\/90,
+html.dark .bg-white\/95,
+html.dark .bg-white\/80,
+html.dark .bg-white\/70 {
+  background-color: #241D35 !important;
+  border-color: #382D50 !important;
+  color: #EDE3FA !important;
+}
+
+html.dark .text-\[\#473450\],
+html.dark .text-\[\#42324A\],
+html.dark .text-\[\#4A3258\],
+html.dark .text-\[\#4B3456\],
+html.dark .text-\[\#4B3953\],
+html.dark .text-\[\#4B3657\],
+html.dark .text-\[\#4C3B53\],
+html.dark .text-\[\#4E3957\],
+html.dark .text-\[\#4E3C56\],
+html.dark .text-\[\#4F3B57\],
+html.dark .text-\[\#55435E\],
+html.dark .text-\[\#55465C\],
+html.dark .text-\[\#564360\] {
+  color: #F5EDFD !important;
+}
+
+html.dark .text-\[\#665171\],
+html.dark .text-\[\#665370\],
+html.dark .text-\[\#67576E\],
+html.dark .text-\[\#685375\],
+html.dark .text-\[\#695275\],
+html.dark .text-\[\#6C5677\],
+html.dark .text-\[\#6E557A\],
+html.dark .text-\[\#6E5677\],
+html.dark .text-\[\#6E587B\],
+html.dark .text-\[\#745B82\],
+html.dark .text-\[\#786483\],
+html.dark .text-\[\#7A6686\],
+html.dark .text-\[\#7B6787\],
+html.dark .text-\[\#7D6B87\],
+html.dark .text-\[\#7F6B8A\],
+html.dark .text-\[\#846F90\],
+html.dark .text-\[\#857090\],
+html.dark .text-\[\#86569B\],
+html.dark .text-\[\#867391\],
+html.dark .text-\[\#867491\],
+html.dark .text-\[\#877491\],
+html.dark .text-\[\#877593\],
+html.dark .text-\[\#887593\],
+html.dark .text-\[\#897793\],
+html.dark .text-\[\#8A7596\],
+html.dark .text-\[\#8A7694\],
+html.dark .text-\[\#8B7498\],
+html.dark .text-\[\#8C7A96\],
+html.dark .text-\[\#8F7D99\],
+html.dark .text-\[\#937C9E\],
+html.dark .text-\[\#94819F\],
+html.dark .text-\[\#9785A1\],
+html.dark .text-\[\#9986A5\],
+html.dark .text-\[\#9B88A5\],
+html.dark .text-\[\#9D8AA6\],
+html.dark .text-\[\#A291AB\],
+html.dark .text-\[\#A694AF\],
+html.dark .text-\[\#A896B2\],
+html.dark .text-\[\#AFA1B7\] {
+  color: #BBA9D0 !important;
+}
+
+html.dark .bg-\[\#FAF6FC\],
+html.dark .bg-\[\#FAF5FC\],
+html.dark .bg-\[\#FAF5FD\],
+html.dark .bg-\[\#FAF7FC\],
+html.dark .bg-\[\#F9F5FC\],
+html.dark .bg-\[\#F7F2FA\],
+html.dark .bg-\[\#F5EEFB\],
+html.dark .bg-\[\#F3ECF8\],
+html.dark .bg-\[\#F3EAF8\],
+html.dark .bg-\[\#F3E8FF\],
+html.dark .bg-\[\#F6EFFB\] {
+  background-color: #1E172C !important;
+  border-color: #382B50 !important;
+}
+
+html.dark .bg-\[\#FFFBF0\],
+html.dark .bg-\[\#FFFDF4\],
+html.dark .bg-\[\#FFFBF3\],
+html.dark .bg-\[\#FFFDF2\],
+html.dark .bg-\[\#FFFDF9\],
+html.dark .bg-\[\#FFFBF7\] {
+  background-color: #261D2F !important;
+  border-color: #4A374C !important;
+  color: #F0E1DA !important;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #191425 !important;
+  border-color: #3B2E53 !important;
+  color: #EDE3FA !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #7A6993 !important;
+}
+
+html.dark .border-\[\#EADCF0\],
+html.dark .border-\[\#ECE0F2\],
+html.dark .border-\[\#EDE5F4\],
+html.dark .border-\[\#E7DCEE\],
+html.dark .border-\[\#E8DEF2\],
+html.dark .border-\[\#E9DFEE\],
+html.dark .border-\[\#E9DDF0\],
+html.dark .border-\[\#EADBEE\],
+html.dark .border-\[\#E8D9F2\],
+html.dark .border-\[\#F2E8F8\],
+html.dark .border-\[\#F3EAF8\],
+html.dark .border-\[\#DECDE7\],
+html.dark .border-\[\#EDE1F2\] {
+  border-color: #382C4F !important;
+}
+
+html.dark .washi-tape {
+  background-color: rgba(147, 51, 234, 0.45) !important;
+  border-left-color: rgba(192, 132, 252, 0.5) !important;
+  border-right-color: rgba(192, 132, 252, 0.5) !important;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #1C172B;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #463462;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64498C;
 }

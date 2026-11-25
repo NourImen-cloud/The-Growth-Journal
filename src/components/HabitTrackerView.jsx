@@ -62,7 +62,7 @@ export default function HabitTrackerView() {
 
   const overallConsistency = totalTrackedCells > 0
     ? Math.round((completedCells / totalTrackedCells) * 100)
-    : 82;
+    : 0;
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
@@ -231,6 +231,35 @@ export default function HabitTrackerView() {
             </p>
 
             <form onSubmit={handleAddHabit} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Quick Suggestions:
+                </label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {[
+                    { name: 'English Practice', cat: 'Learning', col: '#9333EA' },
+                    { name: 'Reading 20 Pages', cat: 'Mind', col: '#EC4899' },
+                    { name: 'Morning Workout', cat: 'Health', col: '#10B981' },
+                    { name: 'Studying AI', cat: 'Learning', col: '#3B82F6' },
+                    { name: 'Night Journaling', cat: 'Mind', col: '#F59E0B' },
+                    { name: 'Sleep by 11 PM', cat: 'Wellness', col: '#6366F1' },
+                  ].map((p, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        setNewHabitName(p.name);
+                        setNewHabitCategory(p.cat);
+                        setNewHabitColor(p.col);
+                      }}
+                      className="text-[10px] bg-[#F5EEFB] text-[#7E22CE] px-2 py-0.5 rounded-full hover:bg-purple-200 transition-colors"
+                    >
+                      + {p.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-[#665370] mb-1">
                   Habit Name

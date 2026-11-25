@@ -12,13 +12,13 @@ import {
   Award,
   ChevronRight,
   TrendingUp,
-  Languages,
-  Mic,
-  Code
+  Edit3,
+  Trash2,
+  BookOpen
 } from 'lucide-react';
 import { useJournal } from '../context/JournalContext';
 import { CuteRibbonBow, LavenderVase, Paperclip } from './AestheticDecorations';
-import { playSoftPop } from '../utils/audio';
+import { playSoftPop, playCelebrationChime } from '../utils/audio';
 
 export default function MonthlyFocusView() {
   const { 
@@ -26,32 +26,62 @@ export default function MonthlyFocusView() {
     currentMonthId, 
     setCurrentMonthId, 
     toggleMonthlyMilestone, 
+    addMonthlyMilestone,
+    deleteMonthlyMilestone,
+    updateMonthlySkill,
     updateMonthlyAssessment,
     updateMonthlyHours,
     addMonthlyFocus 
   } = useJournal();
 
-  const [showAddMonthModal, setShowAddMonthModal] = useState(false);
-  const [newMonthName, setNewMonthName] = useState('');
-  const [newSkillName, setNewSkillName] = useState('');
-  const [newGoalText, setNewGoalText] = useState('');
-  const [newQuoteText, setNewQuoteText] = useState('');
-  const [newTargetHours, setNewTargetHours] = useState(40);
-
   // Active month
   const activeMonth = data.monthlyFocusList.find((m) => m.id === currentMonthId) || data.monthlyFocusList[0];
 
+  // Edit Monthly Skill Modal State
+  const [showEditSkillModal, setShowEditSkillModal] = useState(false);
+  const [editSkillName, setEditSkillName] = useState(activeMonth.skill);
+  const [editGoal, setEditGoal] = useState(activeMonth.goal);
+  const [editQuote, setEditQuote] = useState(activeMonth.quote);
+  const [editTargetHours, setEditTargetHours] = useState(activeMonth.targetHours);
+  const [editMonthName, setEditMonthName] = useState(activeMonth.month);
+
+  // New Milestone inline input
+  const [newMilestoneText, setNewMilestoneText] = useState('');
+
   // Assessment form state
-  const [assessmentStrengths, setAssessmentStrengths] = useState(activeMonth.finalAssessment.strengths || '');
-  const [assessmentGrowth, setAssessmentGrowth] = useState(activeMonth.finalAssessment.growthAreas || '');
-  const [assessmentCarry, setAssessmentCarry] = useState(activeMonth.finalAssessment.carryForward || '');
-  const [assessmentRating, setAssessmentRating] = useState(activeMonth.finalAssessment.selfRating || 4);
+  const [assessmentStrengths, setAssessmentStrengths] = useState(activeMonth.finalAssessment?.strengths || '');
+  const [assessmentGrowth, setAssessmentGrowth] = useState(activeMonth.finalAssessment?.growthAreas || '');
+  const [assessmentCarry, setAssessmentCarry] = useState(activeMonth.finalAssessment?.carryForward || '');
+  const [assessmentRating, setAssessmentRating] = useState(activeMonth.finalAssessment?.selfRating || 0);
   const [savedNotification, setSavedNotification] = useState(false);
 
   // Milestone completion stats
   const completedMilestones = activeMonth.milestones.filter((m) => m.done).length;
-  const milestoneProgress = Math.round((completedMilestones / activeMonth.milestones.length) * 100) || 0;
-  const hoursProgress = Math.round((activeMonth.completedHours / activeMonth.targetHours) * 100);
+  const milestoneProgress = activeMonth.milestones.length > 0
+    ? Math.round((completedMilestones / activeMonth.milestones.length) * 100)
+    : 0;
+  const hoursProgress = activeMonth.targetHours > 0
+    ? Math.round((activeMonth.completedHours / activeMonth.targetHours) * 100)
+    : 0;
+
+  const handleSaveSkill = (e) => {
+    e.preventDefault();
+    updateMonthlySkill(activeMonth.id, {
+      skill: editSkillName,
+      month: editMonthName,
+      goal: editGoal,
+      quote: editQuote,
+      targetHours: Number(editTargetHours),
+    });
+    setShowEditSkillModal(false);
+  };
+
+  const handleAddMilestone = (e) => {
+    e.preventDefault();
+    if (!newMilestoneText.trim()) return;
+    addMonthlyMilestone(activeMonth.id, newMilestoneText.trim());
+    setNewMilestoneText('');
+  };
 
   const handleSaveAssessment = (e) => {
     e.preventDefault();
@@ -64,38 +94,6 @@ export default function MonthlyFocusView() {
     });
     setSavedNotification(true);
     setTimeout(() => setSavedNotification(false), 3000);
-  };
-
-  const handleAddMonth = (e) => {
-    e.preventDefault();
-    if (!newMonthName || !newSkillName) return;
-    const newMonth = {
-      id: `m_${Date.now()}`,
-      month: newMonthName,
-      year: 2027,
-      skill: newSkillName,
-      icon: 'Target',
-      themeColor: '#A855F7',
-      goal: newGoalText || `Master fundamentals of ${newSkillName}`,
-      quote: newQuoteText || "Consistency shapes destiny.",
-      targetHours: Number(newTargetHours),
-      completedHours: 0,
-      milestones: [
-        { id: `ms_${Date.now()}_1`, title: `Complete foundation module for ${newSkillName}`, done: false },
-        { id: `ms_${Date.now()}_2`, title: `Complete weekly practice routine`, done: false },
-        { id: `ms_${Date.now()}_3`, title: `Prepare final capstone project/evaluation`, done: false },
-      ],
-      finalAssessment: {
-        status: 'Upcoming',
-        selfRating: 0,
-        strengths: '',
-        growthAreas: '',
-        carryForward: '',
-      },
-    };
-    addMonthlyFocus(newMonth);
-    setCurrentMonthId(newMonth.id);
-    setShowAddMonthModal(false);
   };
 
   return (
@@ -111,10 +109,11 @@ export default function MonthlyFocusView() {
                 onClick={() => {
                   playSoftPop();
                   setCurrentMonthId(month.id);
-                  setAssessmentStrengths(month.finalAssessment.strengths || '');
-                  setAssessmentGrowth(month.finalAssessment.growthAreas || '');
-                  setAssessmentCarry(month.finalAssessment.carryForward || '');
-                  setAssessmentRating(month.finalAssessment.selfRating || 4);
+                  setEditSkillName(month.skill);
+                  setEditGoal(month.goal);
+                  setEditQuote(month.quote);
+                  setEditTargetHours(month.targetHours);
+                  setEditMonthName(month.month);
                 }}
                 className={`
                   px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold transition-all flex items-center gap-2 shrink-0
@@ -131,11 +130,18 @@ export default function MonthlyFocusView() {
         </div>
 
         <button
-          onClick={() => setShowAddMonthModal(true)}
-          className="px-3.5 py-2 rounded-2xl text-xs font-semibold text-[#8B5CF6] bg-white border border-[#E5D7EF] hover:bg-[#F5EDFB] flex items-center gap-1.5 shadow-2xs"
+          onClick={() => {
+            setEditSkillName(activeMonth.skill);
+            setEditGoal(activeMonth.goal);
+            setEditQuote(activeMonth.quote);
+            setEditTargetHours(activeMonth.targetHours);
+            setEditMonthName(activeMonth.month);
+            setShowEditSkillModal(true);
+          }}
+          className="px-4 py-2 rounded-2xl text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] flex items-center gap-1.5 shadow-md shadow-purple-200"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>New Monthly Focus</span>
+          <Edit3 className="w-3.5 h-3.5" />
+          <span>Define This Month's Skill</span>
         </button>
       </div>
 
@@ -150,13 +156,22 @@ export default function MonthlyFocusView() {
                 01. Monthly Focus • {activeMonth.month} {activeMonth.year}
               </span>
               <span className="text-xs font-medium text-[#8F7D99]">
-                {activeMonth.finalAssessment.status}
+                {activeMonth.finalAssessment?.status || 'In Progress'}
               </span>
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-extrabold text-[#473450] font-title">
-              {activeMonth.skill}
-            </h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-[#473450] font-title">
+                {activeMonth.skill}
+              </h2>
+              <button
+                onClick={() => setShowEditSkillModal(true)}
+                className="p-1.5 rounded-full hover:bg-purple-100 text-[#8B5CF6] transition-colors"
+                title="Edit skill details"
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+            </div>
 
             <p className="text-sm text-[#665171] leading-relaxed">
               {activeMonth.goal}
@@ -172,7 +187,7 @@ export default function MonthlyFocusView() {
           {/* Quick Metrics Cards */}
           <div className="grid grid-cols-2 gap-3 lg:w-72 shrink-0">
             <div className="bg-[#FAF6FC] border border-[#EADBEE] rounded-2xl p-3.5 text-center">
-              <span className="text-[11px] font-semibold text-[#8A7596] uppercase">Milestones</span>
+              <span className="text-[10px] font-semibold text-[#8A7596] uppercase">Milestones</span>
               <div className="font-title text-2xl font-bold text-[#4B3456] my-1">
                 {completedMilestones} / {activeMonth.milestones.length}
               </div>
@@ -182,15 +197,24 @@ export default function MonthlyFocusView() {
                   style={{ width: `${milestoneProgress}%` }}
                 />
               </div>
+              <span className="text-[10px] text-[#93819F] mt-1 block">
+                {milestoneProgress}% complete
+              </span>
             </div>
 
             <div className="bg-[#FAF6FC] border border-[#EADBEE] rounded-2xl p-3.5 text-center">
-              <span className="text-[11px] font-semibold text-[#8A7596] uppercase">Hours Logged</span>
+              <span className="text-[10px] font-semibold text-[#8A7596] uppercase">Study Hours</span>
               <div className="font-title text-2xl font-bold text-[#4B3456] my-1">
                 {activeMonth.completedHours}h
               </div>
-              <div className="text-[10px] text-[#93819F]">
-                Goal: {activeMonth.targetHours}h ({hoursProgress}%)
+              <div className="w-full bg-[#E8DAF0] h-1.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-[#A855F7] h-full rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, hoursProgress)}%` }}
+                />
+              </div>
+              <div className="text-[10px] text-[#93819F] mt-1">
+                Target: {activeMonth.targetHours}h ({hoursProgress}%)
               </div>
             </div>
           </div>
@@ -199,45 +223,80 @@ export default function MonthlyFocusView() {
 
       {/* Two Column Section: Milestones & Final Assessment */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Monthly Milestones Checklist */}
+        {/* Left: Monthly Milestones Checklist (User creates them!) */}
         <div className="bg-white/95 rounded-3xl p-6 border border-[#EADCF0] shadow-soft-card flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-[#F2E8F8]">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-[#A855F7]" />
                 <h3 className="text-base font-bold text-[#473450] font-title">
-                  Monthly Milestones & Key Results
+                  My Monthly Milestones
                 </h3>
               </div>
               <span className="text-xs font-semibold text-[#8B5CF6] bg-[#F5EEFB] px-2 py-0.5 rounded-full">
-                {milestoneProgress}% Complete
+                {milestoneProgress}% Done
               </span>
             </div>
 
-            <div className="mt-4 space-y-2.5">
-              {activeMonth.milestones.map((m) => (
-                <div
-                  key={m.id}
-                  onClick={() => toggleMonthlyMilestone(activeMonth.id, m.id)}
-                  className={`
-                    flex items-start gap-3 p-3 rounded-2xl cursor-pointer transition-all border
-                    ${m.done
-                      ? 'bg-[#F9F5FC] border-[#E8DAF0] text-[#786483]'
-                      : 'bg-white border-[#EDE1F2] text-[#4E3957] hover:border-[#C084FC] hover:shadow-2xs'}
-                  `}
-                >
-                  {m.done ? (
-                    <CheckCircle2 className="w-5 h-5 text-[#A855F7] fill-[#F3E8FF] shrink-0 mt-0.5" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-[#CBB9D4] shrink-0 mt-0.5" />
-                  )}
-                  <div className="flex-1">
-                    <p className={`text-xs md:text-sm font-medium ${m.done ? 'line-through text-[#94819F]' : ''}`}>
-                      {m.title}
-                    </p>
-                  </div>
+            {/* Add Milestone Inline Form */}
+            <form onSubmit={handleAddMilestone} className="mt-3 flex gap-2">
+              <input
+                type="text"
+                placeholder="Add a milestone (e.g. Finish 5 modules, record a talk)..."
+                value={newMilestoneText}
+                onChange={(e) => setNewMilestoneText(e.target.value)}
+                className="flex-1 px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+              />
+              <button
+                type="submit"
+                className="px-3 py-2 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl shrink-0 flex items-center gap-1 shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add</span>
+              </button>
+            </form>
+
+            {/* Milestones list */}
+            <div className="mt-4 space-y-2.5 max-h-72 overflow-y-auto pr-1">
+              {activeMonth.milestones.length === 0 ? (
+                <div className="text-center py-6 text-xs text-[#9B88A5] italic">
+                  No milestones added yet. Type above to define your first milestone! 🌸
                 </div>
-              ))}
+              ) : (
+                activeMonth.milestones.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`
+                      flex items-start justify-between gap-3 p-3 rounded-2xl transition-all border group
+                      ${m.done
+                        ? 'bg-[#F9F5FC] border-[#E8DAF0] text-[#786483]'
+                        : 'bg-white border-[#EDE1F2] text-[#4E3957] hover:border-[#C084FC]'}
+                    `}
+                  >
+                    <div
+                      onClick={() => toggleMonthlyMilestone(activeMonth.id, m.id)}
+                      className="flex items-start gap-3 flex-1 cursor-pointer"
+                    >
+                      {m.done ? (
+                        <CheckCircle2 className="w-5 h-5 text-[#A855F7] fill-[#F3E8FF] shrink-0 mt-0.5" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-[#CBB9D4] shrink-0 mt-0.5" />
+                      )}
+                      <p className={`text-xs md:text-sm font-medium ${m.done ? 'line-through text-[#94819F]' : ''}`}>
+                        {m.title}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => deleteMonthlyMilestone(activeMonth.id, m.id)}
+                      className="opacity-0 group-hover:opacity-100 p-1 text-gray-300 hover:text-red-400 transition-opacity"
+                      title="Delete milestone"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -255,6 +314,15 @@ export default function MonthlyFocusView() {
                 className="w-18 px-2 py-1 text-xs border border-[#DECDE7] rounded-xl text-center font-bold text-[#4B3456]"
               />
               <span className="text-xs text-[#8A7694]">hrs</span>
+
+              <button
+                type="button"
+                onClick={() => updateMonthlyHours(activeMonth.id, activeMonth.completedHours + 1)}
+                className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-[#7E22CE] rounded-lg text-xs font-bold"
+                title="Add 1 hour"
+              >
+                +1h
+              </button>
             </div>
           </div>
         </div>
@@ -297,7 +365,7 @@ export default function MonthlyFocusView() {
                 rows={2}
                 value={assessmentStrengths}
                 onChange={(e) => setAssessmentStrengths(e.target.value)}
-                placeholder="Spoke with less hesitation, maintained 20-minute daily rhythm..."
+                placeholder="Write your breakthroughs, consistency wins, or confidence gains..."
                 className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden text-[#4B3456]"
               />
             </div>
@@ -310,7 +378,7 @@ export default function MonthlyFocusView() {
                 rows={2}
                 value={assessmentGrowth}
                 onChange={(e) => setAssessmentGrowth(e.target.value)}
-                placeholder="Struggled with complex vocabulary during impromptu talks..."
+                placeholder="What challenged you or requires deeper study next time..."
                 className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden text-[#4B3456]"
               />
             </div>
@@ -323,7 +391,7 @@ export default function MonthlyFocusView() {
                 type="text"
                 value={assessmentCarry}
                 onChange={(e) => setAssessmentCarry(e.target.value)}
-                placeholder="Transition speaking poise directly into December Public Speaking!"
+                placeholder="What skill or habit to transition into the coming month..."
                 className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden text-[#4B3456]"
               />
             </div>
@@ -349,18 +417,18 @@ export default function MonthlyFocusView() {
         </div>
       </div>
 
-      {/* Add Custom Month Modal */}
-      {showAddMonthModal && (
-        <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+      {/* Edit Skill Modal */}
+      {showEditSkillModal && (
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-1">
-              Add New Monthly Focus 🎯
+              Define Your Monthly Skill 🎯
             </h3>
             <p className="text-xs text-[#897793] mb-4">
-              Dedicate each month to one transformative skill.
+              Choose the primary capability you want to develop this month.
             </p>
 
-            <form onSubmit={handleAddMonth} className="space-y-3">
+            <form onSubmit={handleSaveSkill} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-[#665370] mb-1">
@@ -368,23 +436,22 @@ export default function MonthlyFocusView() {
                   </label>
                   <input
                     type="text"
-                    placeholder="February"
-                    value={newMonthName}
-                    onChange={(e) => setNewMonthName(e.target.value)}
+                    value={editMonthName}
+                    onChange={(e) => setEditMonthName(e.target.value)}
                     className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-[#665370] mb-1">
-                    Skill Objective
+                    Skill to Learn
                   </label>
                   <input
                     type="text"
-                    placeholder="UI/UX & Design"
-                    value={newSkillName}
-                    onChange={(e) => setNewSkillName(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                    placeholder="e.g. English, Python, Public Speaking"
+                    value={editSkillName}
+                    onChange={(e) => setEditSkillName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden font-bold text-[#6D28D9]"
                     required
                   />
                 </div>
@@ -392,38 +459,41 @@ export default function MonthlyFocusView() {
 
               <div>
                 <label className="block text-xs font-semibold text-[#665370] mb-1">
-                  Primary Learning Goal
+                  Learning Goal & Objective
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="What will you be able to do by the end of this month?"
+                  value={editGoal}
+                  onChange={(e) => setEditGoal(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Inspirational Focus Quote
                 </label>
                 <input
                   type="text"
-                  placeholder="Master wireframing, color theory, and build 2 polished design mockups."
-                  value={newGoalText}
-                  onChange={(e) => setNewGoalText(e.target.value)}
+                  placeholder="A quote to keep you inspired every day..."
+                  value={editQuote}
+                  onChange={(e) => setEditQuote(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-[#665370] mb-1">
-                  Inspirational Quote
-                </label>
-                <input
-                  type="text"
-                  placeholder="Design is not just what it looks like, it is how it works."
-                  value={newQuoteText}
-                  onChange={(e) => setNewQuoteText(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#665370] mb-1">
-                  Target Study Hours
+                  Target Study Hours (Monthly)
                 </label>
                 <input
                   type="number"
-                  value={newTargetHours}
-                  onChange={(e) => setNewTargetHours(e.target.value)}
+                  min="5"
+                  max="200"
+                  value={editTargetHours}
+                  onChange={(e) => setEditTargetHours(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                 />
               </div>
@@ -431,7 +501,7 @@ export default function MonthlyFocusView() {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowAddMonthModal(false)}
+                  onClick={() => setShowEditSkillModal(false)}
                   className="px-3 py-1.5 text-xs text-[#7D6B87]"
                 >
                   Cancel
@@ -440,7 +510,7 @@ export default function MonthlyFocusView() {
                   type="submit"
                   className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl shadow-xs"
                 >
-                  Create Focus
+                  Save Skill Focus
                 </button>
               </div>
             </form>
