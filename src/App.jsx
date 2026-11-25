@@ -9,7 +9,6 @@ import SkillProgressView from './components/SkillProgressView';
 import DailyJournalView from './components/DailyJournalView';
 import AchievementsView from './components/AchievementsView';
 import VisionBoardView from './components/VisionBoardView';
-import BottomDock from './components/BottomDock';
 
 function MainLayout() {
   const { activeSection } = useJournal();
@@ -48,9 +47,6 @@ function MainLayout() {
         <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           {renderActiveSection()}
         </main>
-
-        {/* Floating Quick Dock */}
-        <BottomDock />
       </div>
     </div>
   );

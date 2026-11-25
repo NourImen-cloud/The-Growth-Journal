@@ -100,13 +100,26 @@
    COZY MIDNIGHT / DARK MODE THEME STYLING 
    ========================================= */
 
-html.dark body {
+html.dark,
+html.dark body,
+html.dark #root,
+html.dark .bg-\[\#F8F5F2\],
+html.dark .bg-\[\#FBF8F5\] {
   background-color: #171322 !important;
   color: #EBDFF8 !important;
 }
 
 html.dark .bg-dot-pattern {
-  background-image: radial-gradient(rgba(139, 92, 246, 0.25) 1.2px, transparent 1.2px) !important;
+  background-color: #171322 !important;
+  background-image: radial-gradient(rgba(192, 132, 252, 0.22) 1.2px, transparent 1.2px) !important;
+}
+
+html.dark .bg-\[\#F7EFFC\],
+html.dark .bg-\[\#FAF5FD\],
+html.dark .bg-\[\#F5EEFB\] {
+  background-color: #2D2342 !important;
+  border-color: #4C386A !important;
+  color: #D8B4FE !important;
 }
 
 html.dark aside {

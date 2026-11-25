@@ -7,21 +7,56 @@ import {
   Clock, 
   Sparkles, 
   BookOpen, 
-  ChevronRight,
-  Flame,
-  Heart,
-  Calendar,
-  Languages,
-  PenTool,
-  Headphones,
-  Award,
-  Compass,
-  Edit3
+  ChevronRight, 
+  Flame, 
+  Heart, 
+  Calendar, 
+  Languages, 
+  PenTool, 
+  Headphones, 
+  Award, 
+  Compass, 
+  Edit3, 
+  RotateCcw 
 } from 'lucide-react';
 import { useJournal } from '../context/JournalContext';
 import PomodoroWidget from './PomodoroWidget';
 import { CuteRibbonBow, LavenderVase, Paperclip, FluffyMascot } from './AestheticDecorations';
 import { playSoftPop } from '../utils/audio';
+
+const dailyMotivations = [
+  { text: "One day all your hard work will pay off.", footer: "Keep shining brightly ♡", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FEF08A]" },
+  { text: "Small daily improvements over time lead to stunning results.", footer: "Trust the process ♡", gradient: "from-[#FCE7F3] via-[#EDE9FE] to-[#BAE6FD]" },
+  { text: "You don't have to be extreme, just consistent.", footer: "Step by step ♡", gradient: "from-[#FEF08A] via-[#FBCFE8] to-[#E9D5FF]" },
+  { text: "The secret of getting ahead is getting started.", footer: "Today is your day ✨", gradient: "from-[#EDE9FE] via-[#FCE7F3] to-[#FED7AA]" },
+  { text: "Be proud of every step you take toward your dreams.", footer: "Celebrate yourself ♡", gradient: "from-[#E0E7FF] via-[#FCE7F3] to-[#FDE047]" },
+  { text: "Discipline is simply choosing who you want to become.", footer: "Focus and flourish 🌸", gradient: "from-[#F5D0FE] via-[#E0E7FF] to-[#BBF7D0]" },
+  { text: "Quiet mornings build powerful futures.", footer: "Your time is sacred ♡", gradient: "from-[#DDD6FE] via-[#FBCFE8] to-[#FEF08A]" },
+  { text: "You are capable of far more than you know.", footer: "Believe a little more ✨", gradient: "from-[#FED7AA] via-[#FCE7F3] to-[#E9D5FF]" },
+  { text: "Consistency turns average into excellence.", footer: "Keep showing up ♡", gradient: "from-[#FCE7F3] via-[#DDD6FE] to-[#BAE6FD]" },
+  { text: "Breathe. You don't have to figure it all out today.", footer: "Peaceful progress 🌸", gradient: "from-[#E9D5FF] via-[#FED7AA] to-[#FCE7F3]" },
+  { text: "Every expert was once a beginner who refused to quit.", footer: "You've got this ♡", gradient: "from-[#BAE6FD] via-[#EDE9FE] to-[#FCE7F3]" },
+  { text: "What you water today will bloom tomorrow.", footer: "Patience and grace 🌿", gradient: "from-[#BBF7D0] via-[#FCE7F3] to-[#DDD6FE]" },
+  { text: "Success is the sum of small efforts repeated daily.", footer: "Little by little ♡", gradient: "from-[#FDE047] via-[#FBCFE8] to-[#E0E7FF]" },
+  { text: "Fall in love with the quiet process of learning.", footer: "Curiosity is magic ✨", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FEF08A]" },
+  { text: "Your future self will thank you for today's dedication.", footer: "Make yourself proud ♡", gradient: "from-[#FCE7F3] via-[#E0E7FF] to-[#FED7AA]" },
+  { text: "Mistakes are proof that you are trying and growing.", footer: "Keep going forward 🌸", gradient: "from-[#FED7AA] via-[#DDD6FE] to-[#BAE6FD]" },
+  { text: "Courage doesn't always roar. Sometimes it's a quiet whisper.", footer: "I will try again tomorrow ♡", gradient: "from-[#DDD6FE] via-[#FBCFE8] to-[#FEF08A]" },
+  { text: "Focus on progress, not perfection.", footer: "Grace over guilt ✨", gradient: "from-[#E0E7FF] via-[#FCE7F3] to-[#BBF7D0]" },
+  { text: "A gentle reminder: You are doing better than you think.", footer: "Be kind to yourself ♡", gradient: "from-[#FCE7F3] via-[#FED7AA] to-[#E9D5FF]" },
+  { text: "Energy flows where attention goes.", footer: "Guard your focus 🌸", gradient: "from-[#BAE6FD] via-[#DDD6FE] to-[#FCE7F3]" },
+  { text: "The magic you're looking for is in the work you avoid.", footer: "Start with 5 minutes ♡", gradient: "from-[#FEF08A] via-[#FCE7F3] to-[#E0E7FF]" },
+  { text: "Bloom with grace and quiet confidence.", footer: "Shine your own light ✨", gradient: "from-[#F5D0FE] via-[#FED7AA] to-[#BAE6FD]" },
+  { text: "Action creates clarity. Start before you feel ready.", footer: "Take the leap ♡", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FED7AA]" },
+  { text: "Celebrate the small wins. They are your milestones.", footer: "Every victory counts 🌸", gradient: "from-[#BBF7D0] via-[#DDD6FE] to-[#FCE7F3]" },
+  { text: "Your potential is unlimited. Your focus is your power.", footer: "Own this day ♡", gradient: "from-[#FED7AA] via-[#E0E7FF] to-[#FDE047]" },
+  { text: "Peace begins the moment you choose not to rush.", footer: "Slow and steady ✨", gradient: "from-[#DDD6FE] via-[#FCE7F3] to-[#BAE6FD]" },
+  { text: "Great things are done by a series of small things brought together.", footer: "One piece at a time ♡", gradient: "from-[#FCE7F3] via-[#FEF08A] to-[#E9D5FF]" },
+  { text: "You are the author of this chapter. Write it beautifully.", footer: "Your story matters 🌸", gradient: "from-[#E0E7FF] via-[#FBCFE8] to-[#FED7AA]" },
+  { text: "Do something today that makes tomorrow easier.", footer: "Gift to your future self ♡", gradient: "from-[#FED7AA] via-[#BAE6FD] to-[#DDD6FE]" },
+  { text: "Cultivate a mind that sees opportunities in obstacles.", footer: "Growth mindset ✨", gradient: "from-[#FDE047] via-[#FCE7F3] to-[#E0E7FF]" },
+  { text: "Believe in who you are becoming, every single sunrise.", footer: "You are blooming ♡", gradient: "from-[#E9D5FF] via-[#FED7AA] to-[#FCE7F3]" },
+];
 
 export default function Dashboard() {
   const { 
@@ -53,6 +88,17 @@ export default function Dashboard() {
   const [quickSkillName, setQuickSkillName] = useState(currentMonth.skill);
   const [quickGoal, setQuickGoal] = useState(currentMonth.goal);
   const [quickTargetHours, setQuickTargetHours] = useState(currentMonth.targetHours);
+
+  // Daily Motivation (changes every day based on date)
+  const todayDayNumber = new Date().getDate(); // 1 to 31
+  const [motivationIndex, setMotivationIndex] = useState(Math.max(0, todayDayNumber - 1) % dailyMotivations.length);
+  const currentMotivation = dailyMotivations[motivationIndex];
+
+  const handleNextMotivation = (e) => {
+    e.stopPropagation();
+    playSoftPop();
+    setMotivationIndex((prev) => (prev + 1) % dailyMotivations.length);
+  };
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -393,16 +439,26 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Card 6: Motivation Polaroid (matching user image!) */}
+        {/* Card 6: Daily Motivation Polaroid (changes every day!) */}
         <div className="relative bg-white/95 rounded-3xl p-5 border border-[#ECE0F2] shadow-soft-card flex flex-col justify-between overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider mb-2">
-            <span>✨</span>
-            <span>Motivation</span>
+          {/* Header with day indicator & shuffle button */}
+          <div className="flex items-center justify-between pb-1 mb-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
+              <span>✨</span>
+              <span>Daily Motivation</span>
+            </div>
+            <button
+              onClick={handleNextMotivation}
+              className="text-[10px] text-[#A855F7] hover:text-[#7E22CE] bg-[#FAF5FD] dark:bg-purple-950/50 border border-[#EEDBFA] dark:border-purple-800 px-2 py-0.5 rounded-full flex items-center gap-1 transition-all active:scale-95 shadow-2xs font-semibold"
+              title="Click to discover another inspiring quote"
+            >
+              <RotateCcw className="w-2.5 h-2.5" />
+              <span>Shuffle</span>
+            </button>
           </div>
 
           {/* Polaroid Frame */}
-          <div className="relative bg-[#FFFDF9] border border-[#E8DCB8] p-3 rounded-2xl shadow-md rotate-1 transition-transform hover:rotate-0 duration-300">
+          <div className="relative bg-[#FFFDF9] border border-[#E8DCB8] p-3 rounded-2xl shadow-md rotate-1 transition-all hover:rotate-0 duration-300">
             {/* Purple Washi Tape across top */}
             <div className="washi-tape washi-tape-purple"></div>
 
@@ -411,23 +467,25 @@ export default function Dashboard() {
               🦋
             </div>
 
-            {/* Polaroid Photo area */}
-            <div className="relative h-36 rounded-xl overflow-hidden bg-linear-to-tr from-[#E9D5FF] via-[#FCE7F3] to-[#FEF08A] flex flex-col items-center justify-center p-4 text-center">
+            {/* Polaroid Photo area with today's dynamic quote */}
+            <div className={`relative min-h-[145px] rounded-xl overflow-hidden bg-linear-to-tr ${currentMotivation.gradient} flex flex-col items-center justify-center p-4 text-center transition-all duration-500`}>
               <p className="font-handwriting text-2xl md:text-3xl text-[#4A285E] leading-snug drop-shadow-xs">
-                One day all your hard work will pay off.
+                "{currentMotivation.text}"
               </p>
-              <Heart className="w-4 h-4 text-pink-400 fill-pink-400 mt-2" />
+              <Heart className="w-4 h-4 text-pink-500 fill-pink-400 mt-2 animate-pulse" />
             </div>
 
             {/* Polaroid footer caption with cute Fluffy puppy */}
             <div className="pt-2 flex items-center justify-between text-xs text-[#7F6B8A]">
-              <span className="font-handwriting text-base text-[#6F5B7A]">Keep shining brightly ♡</span>
+              <span className="font-handwriting text-base text-[#6F5B7A]">
+                {currentMotivation.footer}
+              </span>
               <FluffyMascot className="w-10 h-10 -mr-1" />
             </div>
           </div>
 
           <div className="mt-2 text-center text-[11px] text-[#A18EA9]">
-            <span>A little note pinned for your journey</span>
+            <span>Day {todayDayNumber} inspiration for {data.profile.name} ♡</span>
           </div>
         </div>
       </div>
