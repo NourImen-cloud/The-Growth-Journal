@@ -152,9 +152,6 @@ export default function MonthlyFocusView() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-2">
           <div className="space-y-2 max-w-xl">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9333EA] bg-[#F5EEFB] px-2.5 py-1 rounded-full">
-                01. Monthly Focus • {activeMonth.month} {activeMonth.year}
-              </span>
               <span className="text-xs font-medium text-[#8F7D99]">
                 {activeMonth.finalAssessment?.status || 'In Progress'}
               </span>
@@ -359,7 +356,7 @@ export default function MonthlyFocusView() {
           <form onSubmit={handleSaveAssessment} className="mt-4 space-y-3">
             <div>
               <label className="block text-xs font-semibold text-[#6A5774] mb-1">
-                🌟 What went well? (Key wins & breakthroughs)
+                What went well? (Key wins & breakthroughs)
               </label>
               <textarea
                 rows={2}
@@ -372,7 +369,7 @@ export default function MonthlyFocusView() {
 
             <div>
               <label className="block text-xs font-semibold text-[#6A5774] mb-1">
-                🌱 Growth areas & hurdles faced
+                Growth areas & hurdles faced
               </label>
               <textarea
                 rows={2}
@@ -385,7 +382,7 @@ export default function MonthlyFocusView() {
 
             <div>
               <label className="block text-xs font-semibold text-[#6A5774] mb-1">
-                🚀 Carry-forward plan for next month
+                Carry-forward plan for next month
               </label>
               <input
                 type="text"
@@ -422,7 +419,7 @@ export default function MonthlyFocusView() {
         <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-1">
-              Define Your Monthly Skill 🎯
+              Define Your Monthly Skill
             </h3>
             <p className="text-xs text-[#897793] mb-4">
               Choose the primary capability you want to develop this month.

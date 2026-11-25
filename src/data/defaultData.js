@@ -2,7 +2,7 @@ export const initialData = {
   profile: {
     name: "My Journal",
     subtitle: "A little space to track who you're becoming. ♡",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+    avatar: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23F3E8FF'/><circle cx='28' cy='30' r='14' fill='%23EBD5C3' stroke='%238A6B56' stroke-width='2.5'/><circle cx='28' cy='30' r='8' fill='%23F8B4C0'/><circle cx='72' cy='30' r='14' fill='%23EBD5C3' stroke='%238A6B56' stroke-width='2.5'/><circle cx='72' cy='30' r='8' fill='%23F8B4C0'/><circle cx='50' cy='54' r='32' fill='%23FDF3E7' stroke='%238A6B56' stroke-width='2.5'/><ellipse cx='34' cy='60' rx='6' ry='4' fill='%23FFAEC0' opacity='0.6'/><ellipse cx='66' cy='60' rx='6' ry='4' fill='%23FFAEC0' opacity='0.6'/><circle cx='40' cy='50' r='3' fill='%234A3B32'/><circle cx='41' cy='49' r='1' fill='%23FFFFFF'/><circle cx='60' cy='50' r='3' fill='%234A3B32'/><circle cx='61' cy='49' r='1' fill='%23FFFFFF'/><ellipse cx='50' cy='59' rx='9' ry='7' fill='%23FFFFFF' stroke='%23B08D79' stroke-width='1.5'/><ellipse cx='50' cy='56' rx='3.5' ry='2.5' fill='%235A3E2F'/><path d='M50 58.5v3m-3 0q3 2 6 0' stroke='%235A3E2F' stroke-width='1.5' stroke-linecap='round'/><path d='M44 80l-6-5q4 5 0 10l6-5z' fill='%23C084FC' stroke='%237E22CE' stroke-width='1.2'/><path d='M56 80l6-5q-4 5 0 10l-6-5z' fill='%23C084FC' stroke='%237E22CE' stroke-width='1.2'/><circle cx='50' cy='80' r='3' fill='%23DDD6FE' stroke='%237E22CE' stroke-width='1.2'/></svg>",
     theme: "lavender",
   },
 
@@ -27,7 +27,7 @@ export const initialData = {
 
   quickNotes: [
     "Don't stop until you're proud ♡",
-    "Consistency is the true magic wand ✨",
+    "Consistency is the true magic wand ♡",
     "Small steps every day yield big results",
     "Progress, not perfection 🌸",
   ],
@@ -96,7 +96,7 @@ export const initialData = {
     { id: "ach3", title: "Delivered Spoken Reflection", description: "Record and review a spoken monologue with poise.", icon: "🎤", category: "Speaking", unlocked: false, progress: "0/1 recording", color: "#C084FC" },
     { id: "ach4", title: "Completed Technical Module", description: "Complete all exercises of a targeted skill module.", icon: "🎓", category: "Tech", unlocked: false, progress: "In progress", color: "#60A5FA" },
     { id: "ach5", title: "First 7-Day Habit Streak", description: "Hit a 7-day continuous streak in any daily routine.", icon: "🔥", category: "Habits", unlocked: false, progress: "0/7 days", color: "#FB923C" },
-    { id: "ach6", title: "Vocabulary Explorer (30 Words)", description: "Master 30 new words or concepts in your studio.", icon: "✨", category: "Language", unlocked: false, progress: "0/30 words", color: "#A78BFA" },
+    { id: "ach6", title: "Vocabulary Explorer (30 Words)", description: "Master 30 new words or concepts in your studio.", icon: "💎", category: "Language", unlocked: false, progress: "0/30 words", color: "#A78BFA" },
     { id: "ach7", title: "First Deep Work Hours Logged", description: "Log your first 10 deep focus hours in the journal.", icon: "⏳", category: "Milestone", unlocked: false, progress: "0/10 hrs", color: "#34D399" },
     { id: "ach8", title: "First Journal Reflection Penned", description: "Document your very first evening inquiry reflection.", icon: "🪶", category: "Writing", unlocked: false, progress: "0/1 entry", color: "#E879F9" },
   ],
@@ -108,7 +108,7 @@ export const initialData = {
     ],
     readingWishlist: [
       { id: "bk1", title: "Atomic Habits", author: "James Clear", status: "Want to read", cover: "⚡" },
-      { id: "bk2", title: "Show Your Work!", author: "Austin Kleon", status: "Wishlist", cover: "✨" },
+      { id: "bk2", title: "Show Your Work!", author: "Austin Kleon", status: "Wishlist", cover: "💡" },
       { id: "bk3", title: "Deep Work", author: "Cal Newport", status: "Wishlist", cover: "🌿" },
     ],
     bucketList: [

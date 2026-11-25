@@ -52,7 +52,6 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
             <div className="pl-6 flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-1.5 text-xs text-[#8B5CF6] font-semibold tracking-wider uppercase">
-                  <span>✨</span>
                   <span>Daily Planner</span>
                 </div>
                 <h1 className="text-lg font-bold text-[#4C3B53] font-title tracking-tight">

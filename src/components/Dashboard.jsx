@@ -28,33 +28,33 @@ const dailyMotivations = [
   { text: "One day all your hard work will pay off.", footer: "Keep shining brightly ♡", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FEF08A]" },
   { text: "Small daily improvements over time lead to stunning results.", footer: "Trust the process ♡", gradient: "from-[#FCE7F3] via-[#EDE9FE] to-[#BAE6FD]" },
   { text: "You don't have to be extreme, just consistent.", footer: "Step by step ♡", gradient: "from-[#FEF08A] via-[#FBCFE8] to-[#E9D5FF]" },
-  { text: "The secret of getting ahead is getting started.", footer: "Today is your day ✨", gradient: "from-[#EDE9FE] via-[#FCE7F3] to-[#FED7AA]" },
+  { text: "The secret of getting ahead is getting started.", footer: "Today is your day ♡", gradient: "from-[#EDE9FE] via-[#FCE7F3] to-[#FED7AA]" },
   { text: "Be proud of every step you take toward your dreams.", footer: "Celebrate yourself ♡", gradient: "from-[#E0E7FF] via-[#FCE7F3] to-[#FDE047]" },
   { text: "Discipline is simply choosing who you want to become.", footer: "Focus and flourish 🌸", gradient: "from-[#F5D0FE] via-[#E0E7FF] to-[#BBF7D0]" },
   { text: "Quiet mornings build powerful futures.", footer: "Your time is sacred ♡", gradient: "from-[#DDD6FE] via-[#FBCFE8] to-[#FEF08A]" },
-  { text: "You are capable of far more than you know.", footer: "Believe a little more ✨", gradient: "from-[#FED7AA] via-[#FCE7F3] to-[#E9D5FF]" },
+  { text: "You are capable of far more than you know.", footer: "Believe a little more ♡", gradient: "from-[#FED7AA] via-[#FCE7F3] to-[#E9D5FF]" },
   { text: "Consistency turns average into excellence.", footer: "Keep showing up ♡", gradient: "from-[#FCE7F3] via-[#DDD6FE] to-[#BAE6FD]" },
   { text: "Breathe. You don't have to figure it all out today.", footer: "Peaceful progress 🌸", gradient: "from-[#E9D5FF] via-[#FED7AA] to-[#FCE7F3]" },
   { text: "Every expert was once a beginner who refused to quit.", footer: "You've got this ♡", gradient: "from-[#BAE6FD] via-[#EDE9FE] to-[#FCE7F3]" },
   { text: "What you water today will bloom tomorrow.", footer: "Patience and grace 🌿", gradient: "from-[#BBF7D0] via-[#FCE7F3] to-[#DDD6FE]" },
   { text: "Success is the sum of small efforts repeated daily.", footer: "Little by little ♡", gradient: "from-[#FDE047] via-[#FBCFE8] to-[#E0E7FF]" },
-  { text: "Fall in love with the quiet process of learning.", footer: "Curiosity is magic ✨", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FEF08A]" },
+  { text: "Fall in love with the quiet process of learning.", footer: "Curiosity is magic ♡", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FEF08A]" },
   { text: "Your future self will thank you for today's dedication.", footer: "Make yourself proud ♡", gradient: "from-[#FCE7F3] via-[#E0E7FF] to-[#FED7AA]" },
   { text: "Mistakes are proof that you are trying and growing.", footer: "Keep going forward 🌸", gradient: "from-[#FED7AA] via-[#DDD6FE] to-[#BAE6FD]" },
   { text: "Courage doesn't always roar. Sometimes it's a quiet whisper.", footer: "I will try again tomorrow ♡", gradient: "from-[#DDD6FE] via-[#FBCFE8] to-[#FEF08A]" },
-  { text: "Focus on progress, not perfection.", footer: "Grace over guilt ✨", gradient: "from-[#E0E7FF] via-[#FCE7F3] to-[#BBF7D0]" },
+  { text: "Focus on progress, not perfection.", footer: "Grace over guilt ♡", gradient: "from-[#E0E7FF] via-[#FCE7F3] to-[#BBF7D0]" },
   { text: "A gentle reminder: You are doing better than you think.", footer: "Be kind to yourself ♡", gradient: "from-[#FCE7F3] via-[#FED7AA] to-[#E9D5FF]" },
   { text: "Energy flows where attention goes.", footer: "Guard your focus 🌸", gradient: "from-[#BAE6FD] via-[#DDD6FE] to-[#FCE7F3]" },
   { text: "The magic you're looking for is in the work you avoid.", footer: "Start with 5 minutes ♡", gradient: "from-[#FEF08A] via-[#FCE7F3] to-[#E0E7FF]" },
-  { text: "Bloom with grace and quiet confidence.", footer: "Shine your own light ✨", gradient: "from-[#F5D0FE] via-[#FED7AA] to-[#BAE6FD]" },
+  { text: "Bloom with grace and quiet confidence.", footer: "Shine your own light ♡", gradient: "from-[#F5D0FE] via-[#FED7AA] to-[#BAE6FD]" },
   { text: "Action creates clarity. Start before you feel ready.", footer: "Take the leap ♡", gradient: "from-[#E9D5FF] via-[#FCE7F3] to-[#FED7AA]" },
   { text: "Celebrate the small wins. They are your milestones.", footer: "Every victory counts 🌸", gradient: "from-[#BBF7D0] via-[#DDD6FE] to-[#FCE7F3]" },
   { text: "Your potential is unlimited. Your focus is your power.", footer: "Own this day ♡", gradient: "from-[#FED7AA] via-[#E0E7FF] to-[#FDE047]" },
-  { text: "Peace begins the moment you choose not to rush.", footer: "Slow and steady ✨", gradient: "from-[#DDD6FE] via-[#FCE7F3] to-[#BAE6FD]" },
+  { text: "Peace begins the moment you choose not to rush.", footer: "Slow and steady ♡", gradient: "from-[#DDD6FE] via-[#FCE7F3] to-[#BAE6FD]" },
   { text: "Great things are done by a series of small things brought together.", footer: "One piece at a time ♡", gradient: "from-[#FCE7F3] via-[#FEF08A] to-[#E9D5FF]" },
   { text: "You are the author of this chapter. Write it beautifully.", footer: "Your story matters 🌸", gradient: "from-[#E0E7FF] via-[#FBCFE8] to-[#FED7AA]" },
   { text: "Do something today that makes tomorrow easier.", footer: "Gift to your future self ♡", gradient: "from-[#FED7AA] via-[#BAE6FD] to-[#DDD6FE]" },
-  { text: "Cultivate a mind that sees opportunities in obstacles.", footer: "Growth mindset ✨", gradient: "from-[#FDE047] via-[#FCE7F3] to-[#E0E7FF]" },
+  { text: "Cultivate a mind that sees opportunities in obstacles.", footer: "Growth mindset ♡", gradient: "from-[#FDE047] via-[#FCE7F3] to-[#E0E7FF]" },
   { text: "Believe in who you are becoming, every single sunrise.", footer: "You are blooming ♡", gradient: "from-[#E9D5FF] via-[#FED7AA] to-[#FCE7F3]" },
 ];
 
@@ -332,7 +332,6 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-[#F3EAF8]">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
-                <span>📅</span>
                 <span>Today's Plan</span>
               </div>
               <button
@@ -348,7 +347,7 @@ export default function Dashboard() {
             <div className="mt-3 space-y-2 max-h-72 overflow-y-auto pr-1">
               {data.todaySchedule.length === 0 ? (
                 <div className="text-center py-8 text-xs text-[#9B88A5] italic">
-                  Your day is open. Click "+ Add Block" to plan your morning & focus sessions! ✨
+                  Your day is open. Click "+ Add Block" to plan your morning & focus sessions! ♡
                 </div>
               ) : (
                 data.todaySchedule.map((item) => (
@@ -387,7 +386,6 @@ export default function Dashboard() {
         <div className="bg-white/90 backdrop-blur-xs rounded-3xl p-5 border border-[#ECE0F2] shadow-soft-card flex flex-col justify-between">
           <div className="flex items-center justify-between pb-3 border-b border-[#F3EAF8]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
-              <span>📚</span>
               <span>Skill Studio Breakdown</span>
             </div>
             <button
@@ -444,7 +442,6 @@ export default function Dashboard() {
           {/* Header with day indicator & shuffle button */}
           <div className="flex items-center justify-between pb-1 mb-2">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
-              <span>✨</span>
               <span>Daily Motivation</span>
             </div>
             <button
@@ -500,7 +497,6 @@ export default function Dashboard() {
 
           <div className="flex items-center justify-between pb-2 border-b border-[#F3EAF8]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
-              <span>📈</span>
               <span>Weekly Overview</span>
             </div>
           </div>
@@ -544,7 +540,6 @@ export default function Dashboard() {
         <div className="bg-white/90 backdrop-blur-xs rounded-3xl p-5 border border-[#ECE0F2] shadow-soft-card flex flex-col justify-between">
           <div className="flex items-center justify-between pb-2 border-b border-[#F3EAF8]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider">
-              <span>🎯</span>
               <span>Long-Term Goals</span>
             </div>
             <button
@@ -591,7 +586,6 @@ export default function Dashboard() {
 
           <div className="flex items-center justify-between pb-2 border-b border-[#EFE0C2]">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#86569B] uppercase tracking-wider pl-4">
-              <span>📝</span>
               <span>Quick Notes</span>
             </div>
             <button
@@ -708,7 +702,7 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-1">
-              Define This Month's Skill 🎯
+              Define This Month's Skill
             </h3>
             <p className="text-xs text-[#897793] mb-4">
               Set the core ability you are focusing on right now.
@@ -782,7 +776,7 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
-              Add to Today's Plan 📅
+              Add to Today's Plan
             </h3>
             <form onSubmit={handleAddPlan} className="space-y-3">
               <div>
@@ -836,7 +830,7 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
-              Add a Cozy Note 📝
+              Add a Cozy Note
             </h3>
             <form onSubmit={handleAddNote} className="space-y-3">
               <div>

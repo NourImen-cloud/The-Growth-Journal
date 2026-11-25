@@ -62,9 +62,6 @@ export default function VisionBoardView() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9333EA] bg-[#F5EEFB] px-2.5 py-1 rounded-full">
-                06. Vision Board • The Life You Are Designing
-              </span>
               <span className="text-xs text-[#8F7D99]">
                 Dreams, Books & Bucket List
               </span>
@@ -93,7 +90,6 @@ export default function VisionBoardView() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-bold text-[#473450] font-title flex items-center gap-2">
-            <span>✨</span>
             <span>Dreams & Aspirations (Polaroid Gallery)</span>
           </h3>
           <span className="text-xs text-[#8B7498]">Pinned with intention ♡</span>
@@ -153,7 +149,7 @@ export default function VisionBoardView() {
               <div className="flex items-center gap-2">
                 <BookMarked className="w-4 h-4 text-[#A855F7]" />
                 <h3 className="text-base font-bold text-[#473450] font-title">
-                  Books to Read Wishlist 📚
+                  Books to Read Wishlist
                 </h3>
               </div>
               <span className="text-xs text-[#8F7D99]">
@@ -253,7 +249,7 @@ export default function VisionBoardView() {
         <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
-              Pin a Future Dream ✨
+              Pin a Future Dream ♡
             </h3>
             <form onSubmit={handleAddDream} className="space-y-3">
               <div>

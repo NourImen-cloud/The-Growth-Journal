@@ -127,9 +127,6 @@ export default function SkillProgressView() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9333EA] bg-[#F5EEFB] px-2.5 py-1 rounded-full">
-                03. Skill Progress Studio • English Mastery
-              </span>
               <span className="text-xs text-[#8F7D99]">
                 5 Sub-disciplines
               </span>
@@ -190,7 +187,7 @@ export default function SkillProgressView() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs text-[#7A6686]">
-              Click any card to flip and reveal the definition. Mark as mastered to build your lexicon! ✨
+              Click any card to flip and reveal the definition. Mark as mastered to build your lexicon! ♡
             </p>
             <button
               onClick={() => setShowAddVocabModal(true)}

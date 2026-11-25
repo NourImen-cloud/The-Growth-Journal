@@ -5,20 +5,40 @@ import { firePastelConfetti } from '../utils/confetti';
 
 const JournalContext = createContext();
 
-const STORAGE_KEY = 'growth_journal_data_v3_first_time';
+const FORBIDDEN_EMOJI_REGEX = /[📚📅📈🎯📝🚀🌱🌟✨]/g;
+
+function sanitizeData(inputData) {
+  try {
+    const serialized = JSON.stringify(inputData);
+    const sanitized = serialized.replace(FORBIDDEN_EMOJI_REGEX, '♡');
+    const parsed = JSON.parse(sanitized);
+    // Ensure default avatar is always the cute bear SVG and never an unsplash stock photo
+    if (!parsed.profile || !parsed.profile.avatar || parsed.profile.avatar.includes('unsplash.com') || parsed.profile.avatar.includes('images.unsplash')) {
+      parsed.profile = {
+        ...(parsed.profile || {}),
+        avatar: initialData.profile.avatar
+      };
+    }
+    return parsed;
+  } catch {
+    return inputData;
+  }
+}
+
+const STORAGE_KEY = 'growth_journal_data_v6_cute_bear';
 const DARK_MODE_KEY = 'growth_journal_dark_mode';
 
 export function JournalProvider({ children }) {
   const [data, setData] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('growth_journal_data_v5_pure');
       if (saved) {
-        return JSON.parse(saved);
+        return sanitizeData(JSON.parse(saved));
       }
     } catch {
       // Default fallback
     }
-    return initialData;
+    return sanitizeData(initialData);
   });
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -78,7 +98,7 @@ export function JournalProvider({ children }) {
 
   // Reset to clean slate
   const resetToFresh = () => {
-    setData(initialData);
+    setData(sanitizeData(initialData));
     playCelebrationChime();
   };
 
@@ -300,7 +320,7 @@ export function JournalProvider({ children }) {
         {
           id: 'ach_' + Date.now(),
           unlocked: true,
-          unlockedDate: 'Today ✨',
+          unlockedDate: 'Today ♡',
           color: '#C084FC',
           ...newAch,
         },

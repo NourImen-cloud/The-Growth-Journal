@@ -73,9 +73,6 @@ export default function HabitTrackerView() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9333EA] bg-[#F5EEFB] px-2.5 py-1 rounded-full">
-                02. Habit Tracker • November 2026
-              </span>
               <span className="text-xs text-[#8F7D99]">
                 Visual consistency calendar
               </span>

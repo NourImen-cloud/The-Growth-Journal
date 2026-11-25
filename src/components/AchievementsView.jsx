@@ -54,9 +54,6 @@ export default function AchievementsView() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9333EA] bg-[#F5EEFB] px-2.5 py-1 rounded-full">
-                05. Achievements & Milestones Shelf
-              </span>
               <span className="text-xs text-[#8F7D99]">
                 Proof of Consistency
               </span>
@@ -111,7 +108,7 @@ export default function AchievementsView() {
           }}
           className="px-4 py-1.5 rounded-xl bg-white border border-[#EADBEE] text-xs font-semibold text-[#8B5CF6] hover:bg-[#FAF5FC] shadow-2xs"
         >
-          Celebrate All Wins ✨
+          Celebrate All Wins ♡
         </button>
       </div>
 
@@ -181,7 +178,7 @@ export default function AchievementsView() {
                     onClick={() => unlockAchievement(ach.id)}
                     className="text-[10px] font-bold text-white bg-[#A855F7] hover:bg-[#9333EA] px-2.5 py-1 rounded-lg shadow-2xs"
                   >
-                    Claim! ✨
+                    Claim! ♡
                   </button>
                 </div>
               )}
@@ -259,7 +256,7 @@ export default function AchievementsView() {
                     <option value="🔥">🔥 Flame</option>
                     <option value="🌸">🌸 Bloom</option>
                     <option value="⭐">⭐ Star</option>
-                    <option value="✨">✨ Sparkle</option>
+                    <option value="💎">💎 Gem</option>
                   </select>
                 </div>
               </div>

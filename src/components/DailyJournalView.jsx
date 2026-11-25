@@ -32,7 +32,7 @@ export default function DailyJournalView() {
 
   const moodsList = [
     'Peaceful 🌸',
-    'Inspired ✨',
+    'Inspired ♡',
     'Productive ☕',
     'Cozy 🧸',
     'Reflective 🌙',
@@ -79,9 +79,6 @@ export default function DailyJournalView() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9333EA] bg-[#F5EEFB] px-2.5 py-1 rounded-full">
-                04. Daily Journal • Documenting the Journey
-              </span>
               <span className="text-xs text-[#8F7D99]">
                 4 Guided Inquiries
               </span>
@@ -196,7 +193,7 @@ export default function DailyJournalView() {
             {/* Prompt 4: What should I improve tomorrow? */}
             <div className="bg-[#FAF6FC] border border-[#EADBEE] rounded-2xl p-3.5 space-y-1">
               <label className="block text-xs font-bold text-[#6D4284]">
-                4. What should I improve tomorrow? 🚀
+                4. What should I improve tomorrow?
               </label>
               <textarea
                 rows={2}
@@ -238,7 +235,7 @@ export default function DailyJournalView() {
 
             <div className="pt-2 flex items-center justify-between">
               <span className="text-[11px] text-[#9785A1]">
-                Your words are saved safely on your device ✨
+                Your words are saved safely on your device ♡
               </span>
               <button
                 type="submit"
@@ -337,7 +334,7 @@ export default function DailyJournalView() {
                       {entry.prompts?.improve && (
                         <div>
                           <span className="font-bold text-[#7E22CE] block text-[11px]">
-                            🚀 Tomorrow's improvement:
+                            Tomorrow's improvement:
                           </span>
                           <p className="mt-0.5 text-[#634F6D]">{entry.prompts.improve}</p>
                         </div>
