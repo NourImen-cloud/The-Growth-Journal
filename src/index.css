@@ -270,3 +270,26 @@ html.dark ::-webkit-scrollbar-thumb {
 html.dark ::-webkit-scrollbar-thumb:hover {
   background: #64498C;
 }
+
+/* Notification Panel Dark Mode Polish */
+html.dark .notification-panel {
+  background-color: #20182E !important;
+  border-color: #4B3B63 !important;
+}
+
+html.dark .notification-header-title {
+  color: #FFFFFF !important;
+}
+
+html.dark .notification-item-card {
+  background-color: #2A1F3D !important;
+  border-color: #4B3868 !important;
+}
+
+html.dark .notification-item-title {
+  color: #FFFFFF !important;
+}
+
+html.dark .notification-item-message {
+  color: #D4C5E8 !important;
+}

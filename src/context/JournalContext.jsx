@@ -83,6 +83,144 @@ export function JournalProvider({ children }) {
     }
   }, [data]);
 
+  // Notifications State
+  const [dismissedNotifications, setDismissedNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('growth_journal_dismissed_notifications');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [customNotifications, setCustomNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('growth_journal_custom_notifications');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const pushNotification = (notification) => {
+    const newItem = {
+      id: notification.id || 'notif_' + Date.now(),
+      title: notification.title,
+      message: notification.message,
+      type: notification.type || 'info', // 'timer', 'achievement', 'habit', 'journal', 'focus'
+      actionSection: notification.actionSection || null,
+      actionLabel: notification.actionLabel || null,
+      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setCustomNotifications((prev) => {
+      const updated = [newItem, ...prev.filter((n) => n.id !== newItem.id).slice(0, 8)];
+      try {
+        localStorage.setItem('growth_journal_custom_notifications', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    playCelebrationChime();
+  };
+
+  const dismissNotification = (id) => {
+    playSoftPop();
+    setDismissedNotifications((prev) => {
+      const updated = [...prev, id];
+      try {
+        localStorage.setItem('growth_journal_dismissed_notifications', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setCustomNotifications((prev) => {
+      const updated = prev.filter((n) => n.id !== id);
+      try {
+        localStorage.setItem('growth_journal_custom_notifications', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const clearAllNotifications = (activeIds = []) => {
+    playSoftPop();
+    setDismissedNotifications((prev) => {
+      const updated = Array.from(new Set([...prev, ...activeIds]));
+      try {
+        localStorage.setItem('growth_journal_dismissed_notifications', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setCustomNotifications([]);
+    try {
+      localStorage.removeItem('growth_journal_custom_notifications');
+    } catch {}
+  };
+
+  // Derive active dynamic notifications based on live data
+  const getLiveNotifications = () => {
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // 1. Uncompleted habits for today
+    const uncompletedHabits = (data.habits || []).filter(
+      (h) => !data.habitHistory?.[`${h.id}_${todayStr}`]
+    );
+
+    // 2. Journal entry written today?
+    const wroteJournalToday = (data.journalEntries || []).some(
+      (e) => e.date === todayStr
+    );
+
+    // 3. Current month milestones
+    const currentMonth = data.monthlyFocusList?.[0] || {};
+    const milestones = currentMonth.milestones || [];
+    const pendingMilestones = milestones.filter((m) => !m.done);
+
+    const systemReminders = [];
+
+    if (uncompletedHabits.length > 0) {
+      const habitId = `habit_remind_${todayStr}_${uncompletedHabits.length}`;
+      if (!dismissedNotifications.includes(habitId)) {
+        systemReminders.push({
+          id: habitId,
+          title: "Daily Habits Reminder",
+          message: `You have ${uncompletedHabits.length} habit${uncompletedHabits.length > 1 ? 's' : ''} left today: ${uncompletedHabits.slice(0, 2).map((h) => h.name).join(', ')}${uncompletedHabits.length > 2 ? '...' : ''}`,
+          type: 'habit',
+          actionSection: 'habits',
+          actionLabel: 'Check Habits',
+        });
+      }
+    }
+
+    if (!wroteJournalToday) {
+      const journalId = `journal_remind_${todayStr}`;
+      if (!dismissedNotifications.includes(journalId)) {
+        systemReminders.push({
+          id: journalId,
+          title: "Daily Journal Reflection",
+          message: "Take a quiet moment to reflect: What did you learn and achieve today? ♡",
+          type: 'journal',
+          actionSection: 'journal',
+          actionLabel: 'Write Entry',
+        });
+      }
+    }
+
+    if (pendingMilestones.length > 0 && currentMonth.skill) {
+      const focusId = `focus_remind_${currentMonth.id}_${pendingMilestones.length}`;
+      if (!dismissedNotifications.includes(focusId)) {
+        systemReminders.push({
+          id: focusId,
+          title: `Monthly Focus: ${currentMonth.skill}`,
+          message: `${milestones.length - pendingMilestones.length} of ${milestones.length} milestones completed. Keep going!`,
+          type: 'focus',
+          actionSection: 'monthly',
+          actionLabel: 'View Focus',
+        });
+      }
+    }
+
+    return [...customNotifications, ...systemReminders];
+  };
+
   const toggleAmbient = () => {
     const isPlaying = ambientPlayer.toggle();
     setAmbientPlaying(isPlaying);
@@ -304,6 +442,17 @@ export function JournalProvider({ children }) {
   const unlockAchievement = (id) => {
     playCelebrationChime();
     firePastelConfetti();
+    const targetAch = (data.achievements || []).find((a) => a.id === id);
+    if (targetAch) {
+      pushNotification({
+        id: 'ach_unlock_' + id,
+        title: `Achievement Unlocked: ${targetAch.title} 🏆`,
+        message: "Congratulations! You reached a milestone in your growth journey.",
+        type: 'achievement',
+        actionSection: 'rewards',
+        actionLabel: 'View Badges →',
+      });
+    }
     setData((prev) => ({
       ...prev,
       achievements: prev.achievements.map((ach) =>
@@ -541,6 +690,10 @@ export function JournalProvider({ children }) {
         quickNotes: data.quickNotes,
         addQuickNote,
         deleteQuickNote,
+        pushNotification,
+        dismissNotification,
+        clearAllNotifications,
+        getLiveNotifications,
       }}
     >
       {children}

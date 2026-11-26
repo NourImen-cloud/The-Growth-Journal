@@ -3,8 +3,10 @@ import { Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
 import { CuteRibbonBow, BearMascot } from './AestheticDecorations';
 import { playTimerFinishSound, playSoftPop } from '../utils/audio';
 import { firePastelConfetti } from '../utils/confetti';
+import { useJournal } from '../context/JournalContext';
 
 export default function PomodoroWidget() {
+  const { pushNotification } = useJournal();
   const [mode, setMode] = useState('pomodoro'); // pomodoro (25), short (5), long (15)
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
@@ -19,9 +21,17 @@ export default function PomodoroWidget() {
       setIsRunning(false);
       playTimerFinishSound();
       firePastelConfetti();
+      pushNotification({
+        id: 'pomodoro_done_' + Date.now(),
+        title: 'Focus Session Completed! 🌸',
+        message: 'Wonderful work! You completed your focus session. Time to stretch and take a cozy break.',
+        type: 'timer',
+        actionSection: 'dashboard',
+        actionLabel: 'Great job! ♡',
+      });
     }
     return () => clearInterval(timer);
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, pushNotification]);
 
   const switchMode = (newMode) => {
     playSoftPop();
