@@ -34,6 +34,31 @@ export default function Header({ onMenuClick }) {
   const fileInputRef = useRef(null);
   const notificationRef = useRef(null);
 
+  const [notificationPermission, setNotificationPermission] = useState(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission;
+    }
+    return 'unsupported';
+  });
+
+  const handleRequestPermission = async () => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      try {
+        const perm = await Notification.requestPermission();
+        setNotificationPermission(perm);
+        if (perm === 'granted') {
+          playCelebrationChime();
+          new Notification('The Growth Journal 🌸', {
+            body: 'Desktop notifications are active! You will get reminded 5 minutes before tasks begin ♡',
+            icon: '/favicon.ico',
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
   // Close notifications on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -254,8 +279,31 @@ export default function Header({ onMenuClick }) {
                   )}
                 </div>
 
+                {/* 5-Minute Task Reminders Banner */}
+                <div className="mt-3 p-2.5 bg-[#FAF5FE] dark:bg-[#2B1F3F] rounded-2xl flex items-center justify-between text-[11px] border border-[#EADBEE] dark:border-[#4B3965]">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#9333EA] dark:text-[#D8B4FE]" />
+                    <span className="text-[#644D72] dark:text-[#E2D4F0] font-medium">
+                      5-Min Plan Alerts
+                    </span>
+                  </div>
+                  {notificationPermission === 'granted' ? (
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-white dark:bg-[#1E152C] px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800 flex items-center gap-1 shadow-2xs">
+                      <Check className="w-2.5 h-2.5" /> Desktop Active
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleRequestPermission}
+                      className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-white dark:bg-[#1E152C] hover:bg-purple-100 dark:hover:bg-[#392652] px-2.5 py-1 rounded-md border border-purple-200 dark:border-purple-800 transition-colors cursor-pointer shadow-2xs"
+                    >
+                      Enable Desktop Alerts
+                    </button>
+                  )}
+                </div>
+
                 {/* Footer Quick Action */}
-                <div className="mt-3 pt-2.5 border-t border-[#F0E6F5] dark:border-[#382C4E] flex items-center justify-between text-[11px]">
+                <div className="mt-2.5 pt-2 border-t border-[#F0E6F5] dark:border-[#382C4E] flex items-center justify-between text-[11px]">
                   <span className="text-[#9C8AAB] dark:text-[#BFAECF]">
                     Daily Growth Reminders ♡
                   </span>

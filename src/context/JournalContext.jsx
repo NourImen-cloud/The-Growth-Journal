@@ -1,7 +1,25 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { initialData } from '../data/defaultData';
-import { playSoftPop, playCelebrationChime, ambientPlayer } from '../utils/audio';
+import { playSoftPop, playCelebrationChime, playTimerFinishSound, ambientPlayer } from '../utils/audio';
 import { firePastelConfetti } from '../utils/confetti';
+
+export function parseStartTimeInMinutes(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return null;
+  const clean = timeStr.trim();
+  const match = clean.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+  if (!match) return null;
+  let [, hStr, mStr = '0', meridiem] = match;
+  let hours = parseInt(hStr, 10);
+  let minutes = parseInt(mStr, 10);
+  if (isNaN(hours) || isNaN(minutes)) return null;
+  if (meridiem) {
+    const med = meridiem.toLowerCase();
+    if (med === 'pm' && hours < 12) hours += 12;
+    if (med === 'am' && hours === 12) hours = 0;
+  }
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
+  return hours * 60 + minutes;
+}
 
 const JournalContext = createContext();
 
@@ -163,6 +181,144 @@ export function JournalProvider({ children }) {
       localStorage.removeItem('growth_journal_custom_notifications');
     } catch {}
   };
+
+  // Real-time floating toast for upcoming tasks
+  const [activeToast, setActiveToast] = useState(null);
+  const toastTimeoutRef = useRef(null);
+
+  const dismissToast = () => {
+    playSoftPop();
+    setActiveToast(null);
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+  };
+
+  // Track task reminder alerts sent today
+  const [notifiedTaskKeys, setNotifiedTaskKeys] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('growth_journal_notified_tasks');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Automated 5-minute task schedule reminder loop
+  useEffect(() => {
+    const checkScheduleReminders = () => {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const todayDateStr = now.toISOString().split('T')[0];
+
+      const schedule = data.todaySchedule || [];
+      if (schedule.length === 0) return;
+
+      schedule.forEach((task) => {
+        if (task.completed) return;
+        const taskMinutes = parseStartTimeInMinutes(task.time);
+        if (taskMinutes === null) return;
+
+        const diffMinutes = taskMinutes - currentMinutes;
+
+        // 1. 5-Minute advance reminder (diffMinutes between 1 and 5)
+        const fiveMinKey = `${task.id}_5min_${todayDateStr}`;
+        if (diffMinutes > 0 && diffMinutes <= 5 && !notifiedTaskKeys.includes(fiveMinKey)) {
+          setNotifiedTaskKeys((prev) => {
+            const next = [...prev, fiveMinKey];
+            try { sessionStorage.setItem('growth_journal_notified_tasks', JSON.stringify(next)); } catch {}
+            return next;
+          });
+
+          // Drop into Notification Center
+          pushNotification({
+            id: 'task_5m_' + task.id,
+            title: `Starting in ${diffMinutes} min${diffMinutes > 1 ? 's' : ''}! 🌸`,
+            message: `"${task.title}" starts at ${task.time}. Time to wrap up and get ready! ♡`,
+            type: 'timer',
+            actionSection: 'dashboard',
+            actionLabel: 'View Plan',
+          });
+
+          playTimerFinishSound();
+
+          // Show live floating toast
+          setActiveToast({
+            id: task.id,
+            badge: `In ${diffMinutes} min${diffMinutes > 1 ? 's' : ''}`,
+            title: task.title,
+            time: task.time,
+            type: 'upcoming',
+          });
+
+          if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+          toastTimeoutRef.current = setTimeout(() => {
+            setActiveToast(null);
+          }, 9000);
+
+          // Native browser desktop notification if permission granted
+          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            try {
+              new Notification('The Growth Journal 🌸', {
+                body: `Starting in ${diffMinutes} min${diffMinutes > 1 ? 's' : ''}: "${task.title}" at ${task.time}! ♡`,
+                icon: '/favicon.ico',
+              });
+            } catch {}
+          }
+        }
+
+        // 2. Starting right now (0 minutes)
+        const startNowKey = `${task.id}_now_${todayDateStr}`;
+        if (diffMinutes === 0 && !notifiedTaskKeys.includes(startNowKey)) {
+          setNotifiedTaskKeys((prev) => {
+            const next = [...prev, startNowKey];
+            try { sessionStorage.setItem('growth_journal_notified_tasks', JSON.stringify(next)); } catch {}
+            return next;
+          });
+
+          pushNotification({
+            id: 'task_now_' + task.id,
+            title: 'Task Starting Now! 🌸',
+            message: `It is ${task.time}! Your session "${task.title}" begins now. You\'ve got this! ♡`,
+            type: 'timer',
+            actionSection: 'dashboard',
+            actionLabel: 'Open Plan',
+          });
+
+          playCelebrationChime();
+
+          setActiveToast({
+            id: task.id,
+            badge: 'Starting Now!',
+            title: task.title,
+            time: task.time,
+            type: 'now',
+          });
+
+          if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+          toastTimeoutRef.current = setTimeout(() => {
+            setActiveToast(null);
+          }, 9000);
+
+          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            try {
+              new Notification('The Growth Journal 🌸', {
+                body: `Starting now: "${task.title}" at ${task.time}! ♡`,
+                icon: '/favicon.ico',
+              });
+            } catch {}
+          }
+        }
+      });
+    };
+
+    checkScheduleReminders();
+    const interval = setInterval(checkScheduleReminders, 15000);
+    return () => {
+      clearInterval(interval);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, [data.todaySchedule, notifiedTaskKeys]);
 
   // Derive active dynamic notifications based on live data
   const getLiveNotifications = () => {
@@ -723,6 +879,8 @@ export function JournalProvider({ children }) {
         dismissNotification,
         clearAllNotifications,
         getLiveNotifications,
+        activeToast,
+        dismissToast,
       }}
     >
       {children}

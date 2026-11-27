@@ -314,3 +314,12 @@ html.dark .plan-item-duration {
   background-color: #2F2144 !important;
   border-color: #4C376A !important;
 }
+
+/* Floating Toast Alert Dark Mode */
+html.dark .toast-title {
+  color: #FFFFFF !important;
+}
+
+html.dark .toast-subtext {
+  color: #D8B4FE !important;
+}
