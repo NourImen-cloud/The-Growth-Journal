@@ -697,6 +697,20 @@ export function JournalProvider({ children }) {
     }));
   };
 
+  const deleteFlashcard = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      skillsData: {
+        ...prev.skillsData,
+        english: {
+          ...prev.skillsData.english,
+          vocabulary: (prev.skillsData?.english?.vocabulary || []).filter((c) => c.id !== id),
+        },
+      },
+    }));
+  };
+
   const addSpeakingLog = (log) => {
     playCelebrationChime();
     setData((prev) => ({
@@ -709,6 +723,20 @@ export function JournalProvider({ children }) {
             { id: 'sp_' + Date.now(), date: 'Today', ...log },
             ...prev.skillsData.english.speaking,
           ],
+        },
+      },
+    }));
+  };
+
+  const deleteSpeakingLog = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      skillsData: {
+        ...prev.skillsData,
+        english: {
+          ...prev.skillsData.english,
+          speaking: (prev.skillsData?.english?.speaking || []).filter((s) => s.id !== id),
         },
       },
     }));
@@ -731,6 +759,20 @@ export function JournalProvider({ children }) {
     }));
   };
 
+  const deleteWritingEssay = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      skillsData: {
+        ...prev.skillsData,
+        english: {
+          ...prev.skillsData.english,
+          writing: (prev.skillsData?.english?.writing || []).filter((w) => w.id !== id),
+        },
+      },
+    }));
+  };
+
   const addPodcastLog = (podcast) => {
     playCelebrationChime();
     setData((prev) => ({
@@ -743,6 +785,62 @@ export function JournalProvider({ children }) {
             { id: 'ls_' + Date.now(), date: 'Today', ...podcast },
             ...prev.skillsData.english.listening,
           ],
+        },
+      },
+    }));
+  };
+
+  const deletePodcastLog = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      skillsData: {
+        ...prev.skillsData,
+        english: {
+          ...prev.skillsData.english,
+          listening: (prev.skillsData?.english?.listening || []).filter((l) => l.id !== id),
+        },
+      },
+    }));
+  };
+
+  const addBookReading = (book) => {
+    playCelebrationChime();
+    firePastelConfetti();
+    setData((prev) => ({
+      ...prev,
+      skillsData: {
+        ...prev.skillsData,
+        english: {
+          ...prev.skillsData.english,
+          reading: [
+            {
+              id: 'rd_' + Date.now(),
+              title: book.title,
+              author: book.author || 'Author',
+              totalPages: Number(book.totalPages) || 100,
+              pagesRead: Number(book.pagesRead) || 0,
+              rating: Number(book.rating) || 5,
+              status: Number(book.pagesRead) >= Number(book.totalPages) ? 'Completed' : 'Want to read',
+              url: book.url || '',
+              isArticle: !!book.isArticle,
+            },
+            ...(prev.skillsData?.english?.reading || []),
+          ],
+        },
+      },
+    }));
+  };
+
+  const deleteBookReading = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      skillsData: {
+        ...prev.skillsData,
+        english: {
+          ...prev.skillsData.english,
+          reading: (prev.skillsData?.english?.reading || []).filter((b) => b.id !== id),
         },
       },
     }));
@@ -799,6 +897,75 @@ export function JournalProvider({ children }) {
     }));
   };
 
+  const updateBucketItem = (id, updatedText) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      visionBoard: {
+        ...prev.visionBoard,
+        bucketList: (prev.visionBoard?.bucketList || []).map((b) =>
+          b.id === id ? { ...b, item: updatedText } : b
+        ),
+      },
+    }));
+  };
+
+  const deleteBucketItem = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      visionBoard: {
+        ...prev.visionBoard,
+        bucketList: (prev.visionBoard?.bucketList || []).filter((b) => b.id !== id),
+      },
+    }));
+  };
+
+  const addVisionBook = (book) => {
+    playCelebrationChime();
+    setData((prev) => ({
+      ...prev,
+      visionBoard: {
+        ...prev.visionBoard,
+        readingWishlist: [
+          {
+            id: 'bk_' + Date.now(),
+            title: book.title,
+            author: book.author || 'Author',
+            status: book.status || 'Want to read',
+            cover: book.cover || '📖',
+            url: book.url || '',
+          },
+          ...(prev.visionBoard?.readingWishlist || []),
+        ],
+      },
+    }));
+  };
+
+  const updateVisionBook = (id, updatedFields) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      visionBoard: {
+        ...prev.visionBoard,
+        readingWishlist: (prev.visionBoard?.readingWishlist || []).map((b) =>
+          b.id === id ? { ...b, ...updatedFields } : b
+        ),
+      },
+    }));
+  };
+
+  const deleteVisionBook = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      visionBoard: {
+        ...prev.visionBoard,
+        readingWishlist: (prev.visionBoard?.readingWishlist || []).filter((b) => b.id !== id),
+      },
+    }));
+  };
+
   const addVisionDream = (dream) => {
     setData((prev) => ({
       ...prev,
@@ -812,6 +979,17 @@ export function JournalProvider({ children }) {
     }));
     playCelebrationChime();
     firePastelConfetti();
+  };
+
+  const deleteVisionDream = (id) => {
+    playSoftPop();
+    setData((prev) => ({
+      ...prev,
+      visionBoard: {
+        ...prev.visionBoard,
+        dreams: (prev.visionBoard?.dreams || []).filter((d) => d.id !== id),
+      },
+    }));
   };
 
   // Quick notes
@@ -865,13 +1043,25 @@ export function JournalProvider({ children }) {
         addAchievement,
         toggleFlashcardMastered,
         addFlashcard,
+        deleteFlashcard,
         addSpeakingLog,
+        deleteSpeakingLog,
         addWritingEssay,
+        deleteWritingEssay,
         addPodcastLog,
+        deletePodcastLog,
+        addBookReading,
+        deleteBookReading,
         updateBookReadingProgress,
         toggleBucketItem,
         addBucketItem,
+        updateBucketItem,
+        deleteBucketItem,
+        addVisionBook,
+        updateVisionBook,
+        deleteVisionBook,
         addVisionDream,
+        deleteVisionDream,
         quickNotes: data.quickNotes,
         addQuickNote,
         deleteQuickNote,

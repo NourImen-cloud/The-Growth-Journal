@@ -14,7 +14,11 @@ import {
   RotateCw, 
   Eye, 
   BookMarked,
-  Heart
+  Heart,
+  Trash2,
+  ExternalLink,
+  Link,
+  X
 } from 'lucide-react';
 import { useJournal } from '../context/JournalContext';
 import { CuteRibbonBow, LavenderVase, Paperclip } from './AestheticDecorations';
@@ -26,9 +30,15 @@ export default function SkillProgressView() {
     data, 
     toggleFlashcardMastered, 
     addFlashcard, 
+    deleteFlashcard,
     addSpeakingLog, 
+    deleteSpeakingLog,
     addWritingEssay, 
+    deleteWritingEssay,
     addPodcastLog, 
+    deletePodcastLog,
+    addBookReading,
+    deleteBookReading,
     updateBookReadingProgress 
   } = useJournal();
 
@@ -40,6 +50,7 @@ export default function SkillProgressView() {
   const [showAddSpeakingModal, setShowAddSpeakingModal] = useState(false);
   const [showAddWritingModal, setShowAddWritingModal] = useState(false);
   const [showAddPodcastModal, setShowAddPodcastModal] = useState(false);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
 
   // Forms
   const [newWord, setNewWord] = useState('');
@@ -52,6 +63,15 @@ export default function SkillProgressView() {
   const [newEssayText, setNewEssayText] = useState('');
   const [newPodcastTitle, setNewPodcastTitle] = useState('');
   const [newPodcastTakeaway, setNewPodcastTakeaway] = useState('');
+  const [newPodcastUrl, setNewPodcastUrl] = useState('');
+
+  // Book / Article Form
+  const [newBookTitle, setNewBookTitle] = useState('');
+  const [newBookAuthor, setNewBookAuthor] = useState('');
+  const [newBookPages, setNewBookPages] = useState('200');
+  const [newBookCurrent, setNewBookCurrent] = useState('0');
+  const [newBookUrl, setNewBookUrl] = useState('');
+  const [newBookIsArticle, setNewBookIsArticle] = useState(false);
 
   const englishData = data.skillsData.english;
 
@@ -112,10 +132,33 @@ export default function SkillProgressView() {
       host: 'Featured Host',
       duration: '35 min',
       keyTakeaway: newPodcastTakeaway || 'Gained insightful perspective on continuous improvement.',
+      url: newPodcastUrl.trim(),
     });
     setNewPodcastTitle('');
     setNewPodcastTakeaway('');
+    setNewPodcastUrl('');
     setShowAddPodcastModal(false);
+  };
+
+  const handleAddBook = (e) => {
+    e.preventDefault();
+    if (!newBookTitle.trim()) return;
+    addBookReading({
+      title: newBookTitle.trim(),
+      author: newBookAuthor.trim() || (newBookIsArticle ? 'Web Article' : 'Author'),
+      totalPages: Number(newBookPages) || 100,
+      pagesRead: Number(newBookCurrent) || 0,
+      rating: 5,
+      url: newBookUrl.trim(),
+      isArticle: newBookIsArticle,
+    });
+    setNewBookTitle('');
+    setNewBookAuthor('');
+    setNewBookPages('200');
+    setNewBookCurrent('0');
+    setNewBookUrl('');
+    setNewBookIsArticle(false);
+    setShowAddBookModal(false);
   };
 
   return (
@@ -258,8 +301,21 @@ export default function SkillProgressView() {
                   )}
 
                   <div className="pt-2 border-t border-[#F2E8F8] flex items-center justify-between text-[10px] text-[#9785A1]">
-                    <span>Flip Card</span>
-                    {card.mastered && <span className="text-emerald-600 font-bold">✓ Mastered</span>}
+                    <div className="flex items-center gap-2">
+                      <span>Flip Card</span>
+                      {card.mastered && <span className="text-emerald-600 font-bold">✓ Mastered</span>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteFlashcard(card.id);
+                      }}
+                      className="p-1 text-[#B09EB8] hover:text-rose-500 rounded-md transition-colors cursor-pointer"
+                      title="Delete card"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               );
@@ -308,7 +364,17 @@ export default function SkillProgressView() {
 
                 <div className="pt-3 mt-3 border-t border-[#F2E8F8] flex items-center justify-between text-xs text-[#9B88A5]">
                   <span>Speaking Journal</span>
-                  <span className="text-purple-600 font-semibold">Self-reviewed ♡</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-600 font-semibold">Self-reviewed ♡</span>
+                    <button
+                      type="button"
+                      onClick={() => deleteSpeakingLog(log.id)}
+                      className="p-1 text-[#B09EB8] hover:text-rose-500 rounded-md transition-colors cursor-pointer"
+                      title="Delete recording"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -357,7 +423,17 @@ export default function SkillProgressView() {
                   <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
                     {essay.status || 'Published'}
                   </span>
-                  <span>Writing Archive</span>
+                  <div className="flex items-center gap-2">
+                    <span>Writing Archive</span>
+                    <button
+                      type="button"
+                      onClick={() => deleteWritingEssay(essay.id)}
+                      className="p-1 text-[#B09EB8] hover:text-rose-500 rounded-md transition-colors cursor-pointer"
+                      title="Delete essay"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -398,6 +474,17 @@ export default function SkillProgressView() {
                     {item.title}
                   </h4>
                   <p className="text-[11px] text-[#A291AB] mt-0.5">Host: {item.host}</p>
+                  {item.url && (
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#A855F7] hover:text-[#7E22CE] underline mt-1.5"
+                    >
+                      <span>Listen / View Episode</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                   <div className="mt-3 bg-[#FAF5FD] p-3 rounded-2xl border border-[#EADBEE]">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#9333EA] block mb-1">
                       Key Takeaway
@@ -410,7 +497,17 @@ export default function SkillProgressView() {
 
                 <div className="pt-3 mt-3 border-t border-[#F2E8F8] flex items-center justify-between text-xs text-[#9B88A5]">
                   <span>Active Listening</span>
-                  <span className="text-emerald-600 font-semibold">Completed ✓</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-600 font-semibold">Completed ✓</span>
+                    <button
+                      type="button"
+                      onClick={() => deletePodcastLog(item.id)}
+                      className="p-1 text-[#B09EB8] hover:text-rose-500 rounded-md transition-colors cursor-pointer"
+                      title="Delete podcast"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -421,13 +518,22 @@ export default function SkillProgressView() {
       {/* TAB 5: READING BOOKS & ARTICLES */}
       {activeTab === 'reading' && (
         <div className="space-y-4">
-          <p className="text-xs text-[#7A6686]">
-            Books and long-form articles in progress. Drag the slider to update your current page count!
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-[#7A6686]">
+              Books and long-form articles in progress. Drag the slider to update your current page count!
+            </p>
+            <button
+              onClick={() => setShowAddBookModal(true)}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Book / Article</span>
+            </button>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {englishData.reading.map((book) => {
-              const progressPct = Math.round((book.pagesRead / book.totalPages) * 100);
+              const progressPct = Math.round((book.pagesRead / (book.totalPages || 1)) * 100);
               return (
                 <div
                   key={book.id}
@@ -436,11 +542,21 @@ export default function SkillProgressView() {
                   <div>
                     <div className="flex items-center justify-between pb-2 border-b border-[#F2E8F8]">
                       <span className="text-xs font-bold text-[#86569B] uppercase tracking-wider">
-                        {book.status}
+                        {book.isArticle ? 'Online Article' : (book.status || 'In Progress')}
                       </span>
-                      <div className="flex items-center gap-0.5 text-amber-400">
-                        <Star className="w-3.5 h-3.5 fill-amber-400" />
-                        <span className="text-xs font-bold text-[#554160]">{book.rating}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-0.5 text-amber-400">
+                          <Star className="w-3.5 h-3.5 fill-amber-400" />
+                          <span className="text-xs font-bold text-[#554160]">{book.rating || 5}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteBookReading(book.id)}
+                          className="p-1 text-[#B09EB8] hover:text-rose-500 rounded-md transition-colors cursor-pointer"
+                          title="Delete book/article"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
 
@@ -448,6 +564,17 @@ export default function SkillProgressView() {
                       {book.title}
                     </h4>
                     <p className="text-xs text-[#8A7694]">by {book.author}</p>
+                    {book.url && (
+                      <a
+                        href={book.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#A855F7] hover:text-[#7E22CE] underline mt-1.5"
+                      >
+                        <span>Open Book / Article Link</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
 
                     <div className="my-4 space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
@@ -479,7 +606,7 @@ export default function SkillProgressView() {
                   </div>
 
                   <div className="pt-2 border-t border-[#F2E8F8] flex items-center justify-between text-[11px] text-[#867491]">
-                    <span>{book.totalPages - book.pagesRead} pages left</span>
+                    <span>{Math.max(0, book.totalPages - book.pagesRead)} pages left</span>
                     <span className="font-handwriting text-sm text-[#7E22CE]">Happy reading ♡</span>
                   </div>
                 </div>
@@ -678,7 +805,7 @@ export default function SkillProgressView() {
         <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
             <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
-              Log Podcast Episode 🎧
+              Log Podcast Episode ♡
             </h3>
             <form onSubmit={handleAddPodcast} className="space-y-3">
               <div>
@@ -692,6 +819,18 @@ export default function SkillProgressView() {
                   onChange={(e) => setNewPodcastTitle(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Podcast / Audio URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://open.spotify.com/episode/... or YouTube"
+                  value={newPodcastUrl}
+                  onChange={(e) => setNewPodcastUrl(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                 />
               </div>
               <div>
@@ -710,15 +849,144 @@ export default function SkillProgressView() {
                 <button
                   type="button"
                   onClick={() => setShowAddPodcastModal(false)}
-                  className="px-3 py-1.5 text-xs text-[#7D6B87]"
+                  className="px-3 py-1.5 text-xs text-[#7D6B87] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl cursor-pointer"
                 >
                   Save Episode
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Book / Article Modal */}
+      {showAddBookModal && (
+        <div className="fixed inset-0 bg-purple-950/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-[#F2E8F8] mb-3">
+              <h3 className="text-base font-bold text-[#4B3953] font-title">
+                Add Book or Article ♡
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAddBookModal(false)}
+                className="text-[#9C8AA6] hover:text-[#554160] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddBook} className="space-y-3">
+              <div className="flex items-center gap-4 py-1">
+                <label className="flex items-center gap-1.5 text-xs text-[#624E6E] font-medium cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bookType"
+                    checked={!newBookIsArticle}
+                    onChange={() => setNewBookIsArticle(false)}
+                    className="accent-purple-600"
+                  />
+                  <span>Book</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-xs text-[#624E6E] font-medium cursor-pointer">
+                  <input
+                    type="radio"
+                    name="bookType"
+                    checked={newBookIsArticle}
+                    onChange={() => setNewBookIsArticle(true)}
+                    className="accent-purple-600"
+                  />
+                  <span>Article / Essay</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  {newBookIsArticle ? 'Article Title' : 'Book Title'}
+                </label>
+                <input
+                  type="text"
+                  placeholder={newBookIsArticle ? "e.g. How to Think Clearly" : "e.g. Atomic Habits"}
+                  value={newBookTitle}
+                  onChange={(e) => setNewBookTitle(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Author / Publication
+                </label>
+                <input
+                  type="text"
+                  placeholder={newBookIsArticle ? "e.g. Paul Graham / Medium" : "e.g. James Clear"}
+                  value={newBookAuthor}
+                  onChange={(e) => setNewBookAuthor(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                  Link / URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://..."
+                  value={newBookUrl}
+                  onChange={(e) => setNewBookUrl(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#665370] mb-1">
+                    {newBookIsArticle ? 'Est. Pages / Min' : 'Total Pages'}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={newBookPages}
+                    onChange={(e) => setNewBookPages(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#665370] mb-1">
+                    Current Progress
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={newBookCurrent}
+                    onChange={(e) => setNewBookCurrent(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddBookModal(false)}
+                  className="px-3 py-1.5 text-xs text-[#7D6B87] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl cursor-pointer"
+                >
+                  Add to Reading List
                 </button>
               </div>
             </form>
