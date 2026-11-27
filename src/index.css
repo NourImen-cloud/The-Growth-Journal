@@ -293,3 +293,24 @@ html.dark .notification-item-title {
 html.dark .notification-item-message {
   color: #D4C5E8 !important;
 }
+
+/* Today's Plan Dark Mode Polish */
+html.dark .plan-item-title {
+  color: #FFFFFF !important;
+}
+
+html.dark .plan-item-title-completed {
+  color: #9986A4 !important;
+}
+
+html.dark .plan-item-time {
+  color: #E9D5FF !important;
+  background-color: #382650 !important;
+  border-color: #553A7B !important;
+}
+
+html.dark .plan-item-duration {
+  color: #D8B4FE !important;
+  background-color: #2F2144 !important;
+  border-color: #4C376A !important;
+}

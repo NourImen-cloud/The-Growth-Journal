@@ -61,6 +61,36 @@ const dailyMotivations = [
   { text: "Believe in who you are becoming, every single sunrise.", footer: "You are blooming ♡", gradient: "from-[#E9D5FF] via-[#FED7AA] to-[#FCE7F3]" },
 ];
 
+function guessDurationFromTime(timeStr) {
+  if (!timeStr) return null;
+  // Match formats like "13:00 to 15:00", "13:00 - 15:00", "1:00 PM to 3:00 PM", "08:00 - 10:30"
+  const match = timeStr.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:to|-)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+  if (!match) return null;
+  let [, h1, m1 = '0', p1, h2, m2 = '0', p2] = match;
+  let hour1 = parseInt(h1, 10);
+  let min1 = parseInt(m1, 10);
+  let hour2 = parseInt(h2, 10);
+  let min2 = parseInt(m2, 10);
+
+  if (p1 && p1.toLowerCase() === 'pm' && hour1 < 12) hour1 += 12;
+  if (p1 && p1.toLowerCase() === 'am' && hour1 === 12) hour1 = 0;
+  if (p2 && p2.toLowerCase() === 'pm' && hour2 < 12) hour2 += 12;
+  if (p2 && p2.toLowerCase() === 'am' && hour2 === 12) hour2 = 0;
+
+  const totalMin1 = hour1 * 60 + min1;
+  const totalMin2 = hour2 * 60 + min2;
+  const diff = totalMin2 - totalMin1;
+
+  if (diff > 0) {
+    const hours = Math.floor(diff / 60);
+    const mins = diff % 60;
+    if (hours > 0 && mins === 0) return `${hours} hr${hours > 1 ? 's' : ''}`;
+    if (hours > 0 && mins > 0) return `${hours} hr ${mins} mins`;
+    if (hours === 0 && mins > 0) return `${mins} mins`;
+  }
+  return null;
+}
+
 export default function Dashboard() {
   const { 
     data, 
@@ -121,6 +151,14 @@ export default function Dashboard() {
     : 0;
 
   // Plan Handlers
+  const handleTimeChange = (val) => {
+    setPlanTime(val);
+    const guessed = guessDurationFromTime(val);
+    if (guessed) {
+      setPlanDuration(guessed);
+    }
+  };
+
   const handleOpenAddPlan = () => {
     playSoftPop();
     setEditingPlanId(null);
@@ -388,50 +426,59 @@ export default function Dashboard() {
                   <div
                     key={item.id}
                     className={`
-                      flex items-center justify-between p-2 rounded-xl text-xs transition-colors border group
+                      flex items-start justify-between p-3 rounded-2xl text-xs transition-all border group
                       ${item.completed 
-                        ? 'bg-[#FAF7FC] border-[#EEDBFA] text-[#887593] line-through' 
-                        : 'bg-white border-[#F0E5F5] text-[#4E3C56] hover:border-[#D8B4FE]'}
+                        ? 'bg-[#FAF7FC] dark:bg-[#20182E] border-[#EEDBFA] dark:border-[#3E2F54] text-[#887593] dark:text-[#7A6A8C]' 
+                        : 'bg-white dark:bg-[#281F38] border-[#F0E5F5] dark:border-[#43345A] text-[#4E3C56] dark:text-[#E8DEF2] hover:border-[#D8B4FE] dark:hover:border-[#7A5B9C] shadow-2xs'}
                     `}
                   >
+                    {/* Left: Checkbox + Title + Time/Duration Info */}
                     <div 
                       onClick={() => toggleScheduleItem(item.id)}
-                      className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
+                      className="flex items-start gap-2.5 flex-1 min-w-0 cursor-pointer"
                     >
                       <button
                         type="button"
-                        className="text-[#A855F7] hover:text-[#9333EA] transition-colors shrink-0"
+                        className="text-[#A855F7] hover:text-[#9333EA] transition-colors shrink-0 mt-0.5"
                         title={item.completed ? "Mark incomplete" : "Mark completed"}
                       >
                         {item.completed ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-500" />
+                          <CheckCircle2 className="w-4 h-4 text-purple-500 fill-purple-100 dark:fill-purple-950/40" />
                         ) : (
-                          <Circle className="w-3.5 h-3.5 text-[#C4B2D4]" />
+                          <Circle className="w-4 h-4 text-[#C4B2D4] hover:text-[#A855F7]" />
                         )}
                       </button>
-                      <span className="font-mono text-[11px] font-semibold text-[#8C52AA] w-16 shrink-0">
-                        {item.time}
-                      </span>
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color || '#A855F7' }} />
-                      <span className={`font-medium truncate max-w-[130px] ${item.completed ? 'line-through text-[#9986A4]' : ''}`}>
-                        {item.title}
-                      </span>
+
+                      <div className="flex-1 min-w-0">
+                        {/* Task Title - Spacious and never prematurely truncated */}
+                        <p className={`font-semibold text-xs leading-snug break-words ${item.completed ? 'plan-item-title-completed line-through text-[#9986A4]' : 'plan-item-title text-[#44334C]'}`}>
+                          {item.title}
+                        </p>
+
+                        {/* Subline: Time range badge + Duration pill */}
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                          <span className="plan-item-time font-mono text-[11px] font-semibold text-[#8C52AA] bg-[#F7EFFC] px-2 py-0.5 rounded-md border border-[#EDE2F4]">
+                            {item.time}
+                          </span>
+                          <span className="plan-item-duration font-mono text-[10px] text-[#8A7996] bg-[#FDFBFD] px-2 py-0.5 rounded-md border border-[#EFE8F5]">
+                            {item.duration}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                      <span className="text-[10px] text-[#A291AB] font-mono shrink-0 bg-[#FBF8FD] px-1.5 py-0.5 rounded-md border border-[#F0E5F5]">
-                        {item.duration}
-                      </span>
+                    {/* Right: Edit & Delete buttons */}
+                    <div className="flex items-center gap-1 shrink-0 ml-2 pt-0.5">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleOpenEditPlan(item);
                         }}
-                        className="p-1 rounded-md text-[#9E8CA9] hover:text-[#9333EA] hover:bg-[#F3EAF8] transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-[#9E8CA9] dark:text-[#C5B5D8] hover:text-[#9333EA] dark:hover:text-[#FAF5FF] hover:bg-[#F3EAF8] dark:hover:bg-[#43325C] transition-colors cursor-pointer"
                         title="Edit task"
                       >
-                        <Pencil className="w-3 h-3" />
+                        <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         type="button"
@@ -439,10 +486,10 @@ export default function Dashboard() {
                           e.stopPropagation();
                           deleteScheduleItem(item.id);
                         }}
-                        className="p-1 rounded-md text-[#9E8CA9] hover:text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-[#9E8CA9] dark:text-[#C5B5D8] hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                         title="Delete task"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -872,13 +919,13 @@ export default function Dashboard() {
             <form onSubmit={handleSavePlan} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-semibold text-[#665370] dark:text-[#C5B5D8] mb-1">
-                  Time (e.g. 08:00 AM)
+                  Time (e.g. 13:00 to 15:00, or 08:00 AM)
                 </label>
                 <input
                   type="text"
-                  placeholder="08:00 AM"
+                  placeholder="e.g. 13:00 to 15:00"
                   value={planTime}
-                  onChange={(e) => setPlanTime(e.target.value)}
+                  onChange={(e) => handleTimeChange(e.target.value)}
                   className="w-full px-3 py-2 text-xs bg-white dark:bg-[#2A1F3D] border border-[#DECDE7] dark:border-[#4B3868] text-[#4E3C56] dark:text-[#FAF5FF] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                   required
                 />
