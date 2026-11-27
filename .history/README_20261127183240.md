@@ -1,0 +1,21 @@
+The Growth Journal
+
+The Growth Journal is a personal self-development website designed to help you stay organized, build better habits, track your progress, and work towards becoming the best version of yourself.
+
+The idea is simple: create a personal space where you can document your journey, set goals, and see how much you grow over time.
+
+Features
+
+Monthly Goals: Set monthly objectives and keep track of your priorities.
+
+Habit Tracker: Track your daily habits and monitor your consistency.
+
+Skill Tracking: Follow your progress while learning new skills.
+
+Daily Journal: Write down your thoughts, experiences, and reflections.
+
+Achievements: Keep track of milestones and celebrate your progress.
+
+Vision Board: Organize your goals and visualize the person you want to become.
+
+Progress Statistics: Get an overview of your personal growth over time.
