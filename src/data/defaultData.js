@@ -40,7 +40,7 @@ export const initialData = {
       skill: "English & Communication",
       icon: "Languages",
       themeColor: "#9333EA",
-      goal: "Set your learning objective for this month (e.g. conversational fluency, daily essays, or coding algorithms).",
+      goal: "Set your learning objective for this month.",
       quote: "Language is the roadmap of a culture. It tells you where its people come from and where they are going.",
       targetHours: 30,
       completedHours: 0,

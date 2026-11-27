@@ -17,7 +17,10 @@ import {
   Award, 
   Compass, 
   Edit3, 
-  RotateCcw 
+  RotateCcw,
+  Pencil,
+  Trash2,
+  X
 } from 'lucide-react';
 import { useJournal } from '../context/JournalContext';
 import PomodoroWidget from './PomodoroWidget';
@@ -64,15 +67,21 @@ export default function Dashboard() {
     setActiveSection, 
     toggleScheduleItem, 
     addScheduleItem, 
+    updateScheduleItem,
+    deleteScheduleItem,
     toggleHabitDate, 
     addHabit,
     updateMonthlySkill,
     addQuickNote 
   } = useJournal();
 
-  const [newScheduleTitle, setNewScheduleTitle] = useState('');
-  const [newScheduleTime, setNewScheduleTime] = useState('');
-  const [showAddPlanModal, setShowAddPlanModal] = useState(false);
+  // Today's Plan Modal & Editing State
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [editingPlanId, setEditingPlanId] = useState(null);
+  const [planTitle, setPlanTitle] = useState('');
+  const [planTime, setPlanTime] = useState('');
+  const [planDuration, setPlanDuration] = useState('1 hr');
+
   const [newNoteText, setNewNoteText] = useState('');
   const [showAddNote, setShowAddNote] = useState(false);
 
@@ -83,8 +92,8 @@ export default function Dashboard() {
   const [newHabitColor, setNewHabitColor] = useState('#A855F7');
 
   // Quick Edit Monthly Skill Modal
-  const [showEditSkillModal, setShowEditSkillModal] = useState(false);
   const currentMonth = data.monthlyFocusList[0];
+  const [showEditSkillModal, setShowEditSkillModal] = useState(false);
   const [quickSkillName, setQuickSkillName] = useState(currentMonth.skill);
   const [quickGoal, setQuickGoal] = useState(currentMonth.goal);
   const [quickTargetHours, setQuickTargetHours] = useState(currentMonth.targetHours);
@@ -111,19 +120,44 @@ export default function Dashboard() {
     ? Math.round((currentMonth.completedHours / currentMonth.targetHours) * 100)
     : 0;
 
-  const handleAddPlan = (e) => {
+  // Plan Handlers
+  const handleOpenAddPlan = () => {
+    playSoftPop();
+    setEditingPlanId(null);
+    setPlanTitle('');
+    setPlanTime('');
+    setPlanDuration('1 hr');
+    setShowPlanModal(true);
+  };
+
+  const handleOpenEditPlan = (item) => {
+    playSoftPop();
+    setEditingPlanId(item.id);
+    setPlanTitle(item.title);
+    setPlanTime(item.time);
+    setPlanDuration(item.duration || '1 hr');
+    setShowPlanModal(true);
+  };
+
+  const handleSavePlan = (e) => {
     e.preventDefault();
-    if (!newScheduleTitle || !newScheduleTime) return;
-    addScheduleItem({
-      time: newScheduleTime,
-      title: newScheduleTitle,
-      duration: '45 mins',
-      category: 'Focus',
-      color: '#A855F7',
-    });
-    setNewScheduleTitle('');
-    setNewScheduleTime('');
-    setShowAddPlanModal(false);
+    if (!planTitle.trim() || !planTime.trim()) return;
+    if (editingPlanId) {
+      updateScheduleItem(editingPlanId, {
+        time: planTime.trim(),
+        title: planTitle.trim(),
+        duration: planDuration.trim() || '45 mins',
+      });
+    } else {
+      addScheduleItem({
+        time: planTime.trim(),
+        title: planTitle.trim(),
+        duration: planDuration.trim() || '45 mins',
+        category: 'Focus',
+        color: '#A855F7',
+      });
+    }
+    setShowPlanModal(false);
   };
 
   const handleAddHabit = (e) => {
@@ -335,8 +369,8 @@ export default function Dashboard() {
                 <span>Today's Plan</span>
               </div>
               <button
-                onClick={() => setShowAddPlanModal(true)}
-                className="text-[11px] font-semibold text-[#A855F7] dark:text-purple-300 bg-[#F7EFFC] dark:bg-purple-900/50 hover:bg-[#EEDFFA] dark:hover:bg-purple-900/70 border border-[#EEDBFA] dark:border-purple-800 px-2.5 py-1 rounded-full transition-colors flex items-center gap-1"
+                onClick={handleOpenAddPlan}
+                className="text-[11px] font-semibold text-[#A855F7] dark:text-purple-300 bg-[#F7EFFC] dark:bg-purple-900/50 hover:bg-[#EEDFFA] dark:hover:bg-purple-900/70 border border-[#EEDBFA] dark:border-purple-800 px-2.5 py-1 rounded-full transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3 h-3" />
                 <span>Add Block</span>
@@ -353,24 +387,64 @@ export default function Dashboard() {
                 data.todaySchedule.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => toggleScheduleItem(item.id)}
                     className={`
-                      flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-colors border
+                      flex items-center justify-between p-2 rounded-xl text-xs transition-colors border group
                       ${item.completed 
                         ? 'bg-[#FAF7FC] border-[#EEDBFA] text-[#887593] line-through' 
                         : 'bg-white border-[#F0E5F5] text-[#4E3C56] hover:border-[#D8B4FE]'}
                     `}
                   >
-                    <div className="flex items-center gap-2">
+                    <div 
+                      onClick={() => toggleScheduleItem(item.id)}
+                      className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
+                    >
+                      <button
+                        type="button"
+                        className="text-[#A855F7] hover:text-[#9333EA] transition-colors shrink-0"
+                        title={item.completed ? "Mark incomplete" : "Mark completed"}
+                      >
+                        {item.completed ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-500" />
+                        ) : (
+                          <Circle className="w-3.5 h-3.5 text-[#C4B2D4]" />
+                        )}
+                      </button>
                       <span className="font-mono text-[11px] font-semibold text-[#8C52AA] w-16 shrink-0">
                         {item.time}
                       </span>
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="font-medium truncate max-w-[130px]">{item.title}</span>
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color || '#A855F7' }} />
+                      <span className={`font-medium truncate max-w-[130px] ${item.completed ? 'line-through text-[#9986A4]' : ''}`}>
+                        {item.title}
+                      </span>
                     </div>
-                    <span className="text-[10px] text-[#A291AB] font-mono shrink-0">
-                      {item.duration}
-                    </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                      <span className="text-[10px] text-[#A291AB] font-mono shrink-0 bg-[#FBF8FD] px-1.5 py-0.5 rounded-md border border-[#F0E5F5]">
+                        {item.duration}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditPlan(item);
+                        }}
+                        className="p-1 rounded-md text-[#9E8CA9] hover:text-[#9333EA] hover:bg-[#F3EAF8] transition-colors cursor-pointer"
+                        title="Edit task"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteScheduleItem(item.id);
+                        }}
+                        className="p-1 rounded-md text-[#9E8CA9] hover:text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Delete task"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
@@ -771,53 +845,103 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Add Plan Modal */}
-      {showAddPlanModal && (
-        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] shadow-2xl">
-            <h3 className="text-base font-bold text-[#4B3953] font-title mb-2">
-              Add to Today's Plan
-            </h3>
-            <form onSubmit={handleAddPlan} className="space-y-3">
+      {/* Add / Edit Plan Modal */}
+      {showPlanModal && (
+        <div className="fixed inset-0 bg-purple-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#20182E] rounded-3xl p-6 w-full max-w-sm border border-[#EADDF0] dark:border-[#46365C] shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-[#F0E6F5] dark:border-[#382C4E] mb-3">
+              <h3 className="text-base font-bold text-[#4B3953] dark:text-[#FAF5FF] font-title">
+                {editingPlanId ? "Edit Today's Plan Block" : "Add to Today's Plan"}
+              </h3>
+              {editingPlanId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteScheduleItem(editingPlanId);
+                    setShowPlanModal(false);
+                  }}
+                  className="text-xs text-rose-500 hover:text-rose-700 flex items-center gap-1 font-medium cursor-pointer"
+                  title="Delete this block"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+              )}
+            </div>
+
+            <form onSubmit={handleSavePlan} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-[#665370] mb-1">
-                  Time (e.g., 08:00 AM)
+                <label className="block text-xs font-semibold text-[#665370] dark:text-[#C5B5D8] mb-1">
+                  Time (e.g. 08:00 AM)
                 </label>
                 <input
                   type="text"
                   placeholder="08:00 AM"
-                  value={newScheduleTime}
-                  onChange={(e) => setNewScheduleTime(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  value={planTime}
+                  onChange={(e) => setPlanTime(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-[#2A1F3D] border border-[#DECDE7] dark:border-[#4B3868] text-[#4E3C56] dark:text-[#FAF5FF] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                   required
                 />
               </div>
+
               <div>
-                <label className="block text-xs font-semibold text-[#665370] mb-1">
+                <label className="block text-xs font-semibold text-[#665370] dark:text-[#C5B5D8] mb-1">
                   Activity Title
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. English listening podcast"
-                  value={newScheduleTitle}
-                  onChange={(e) => setNewScheduleTitle(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-[#DECDE7] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  value={planTitle}
+                  onChange={(e) => setPlanTitle(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-[#2A1F3D] border border-[#DECDE7] dark:border-[#4B3868] text-[#4E3C56] dark:text-[#FAF5FF] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
                   required
                 />
               </div>
-              <div className="flex justify-end gap-2 pt-2">
+
+              <div>
+                <label className="block text-xs font-semibold text-[#665370] dark:text-[#C5B5D8] mb-1">
+                  Duration (e.g. 2 hrs, 45 mins)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 2 hrs, 45 mins, 2H"
+                  value={planDuration}
+                  onChange={(e) => setPlanDuration(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-[#2A1F3D] border border-[#DECDE7] dark:border-[#4B3868] text-[#4E3C56] dark:text-[#FAF5FF] rounded-xl focus:border-[#A855F7] focus:outline-hidden"
+                  required
+                />
+                {/* Quick Presets */}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {['30 mins', '45 mins', '1 hr', '1.5 hrs', '2 hrs', '3 hrs'].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setPlanDuration(preset)}
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border transition-all cursor-pointer ${
+                        planDuration === preset
+                          ? 'bg-[#A855F7] text-white border-[#A855F7]'
+                          : 'bg-[#FAF5FD] dark:bg-[#2F2144] text-[#7E6A8F] dark:text-[#B5A5CA] border-[#E8DEF2] dark:border-[#49375F] hover:bg-purple-100'
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-[#F0E6F5] dark:border-[#382C4E]">
                 <button
                   type="button"
-                  onClick={() => setShowAddPlanModal(false)}
-                  className="px-3 py-1.5 text-xs text-[#7D6B87]"
+                  onClick={() => setShowPlanModal(false)}
+                  className="px-3 py-1.5 text-xs text-[#7D6B87] dark:text-[#A796B8] hover:text-[#5F4B6E] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-[#A855F7] hover:bg-[#9333EA] rounded-xl cursor-pointer shadow-xs"
                 >
-                  Add Block
+                  {editingPlanId ? "Save Changes" : "Add Block"}
                 </button>
               </div>
             </form>

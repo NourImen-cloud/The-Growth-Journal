@@ -19,6 +19,15 @@ function sanitizeData(inputData) {
         avatar: initialData.profile.avatar
       };
     }
+    // Clean out unwanted parenthetical example from monthly goals
+    if (parsed.monthlyFocusList && Array.isArray(parsed.monthlyFocusList)) {
+      parsed.monthlyFocusList = parsed.monthlyFocusList.map((m) => {
+        if (typeof m.goal === 'string') {
+          m.goal = m.goal.replace(/\s*\(e\.g\.\s*conversational fluency, daily essays, or coding algorithms\)\.?/gi, '').trim();
+        }
+        return m;
+      });
+    }
     return parsed;
   } catch {
     return inputData;
@@ -255,6 +264,24 @@ export function JournalProvider({ children }) {
     setData((prev) => ({
       ...prev,
       todaySchedule: [...prev.todaySchedule, { ...item, id: Date.now().toString(), completed: false }],
+    }));
+    playSoftPop();
+  };
+
+  const updateScheduleItem = (id, updatedFields) => {
+    setData((prev) => ({
+      ...prev,
+      todaySchedule: (prev.todaySchedule || []).map((item) =>
+        item.id === id ? { ...item, ...updatedFields } : item
+      ),
+    }));
+    playSoftPop();
+  };
+
+  const deleteScheduleItem = (id) => {
+    setData((prev) => ({
+      ...prev,
+      todaySchedule: (prev.todaySchedule || []).filter((item) => item.id !== id),
     }));
     playSoftPop();
   };
@@ -664,6 +691,8 @@ export function JournalProvider({ children }) {
         resetToFresh,
         toggleScheduleItem,
         addScheduleItem,
+        updateScheduleItem,
+        deleteScheduleItem,
         toggleHabitDate,
         addHabit,
         deleteHabit,
